@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>STARLUXE | Admin Dashboard</title>
+
+<link rel="stylesheet" href="styles.css">
+
+<style>
+:root {
+    --gold: #d6ad60;
+    --dark: #101010;
+    --panel: #191919;
+    --border: #303030;
+    --muted: #999;
+}
+
+body {
+    background: #101010;
+    color: white;
+}
+
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background: #151515;
+    border-right: 1px solid var(--border);
+    padding: 25px 18px;
+    flex-shrink: 0;
+}
+
+.admin-logo {
+    display: block;
+    color: white;
+    text-decoration: none;
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 35px;
+}
+
+.admin-logo span {
+    color: var(--gold);
+}
+
+.sidebar-label {
+    color: #777;
+    font-size: 11px;
+    letter-spacing: 2px;
+    margin: 25px 10px 12px;
+}
+
+.sidebar button {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+    color: #bbb;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.sidebar button:hover,
+.sidebar button.active {
+    background: #302719;
+    color: var(--gold);
+}
+
+.admin-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 30px;
+    background: #151515;
+    border-bottom: 1px solid var(--border);
+    gap: 15px;
+}
+
+.topbar h1 {
+    font-size: 22px;
+    color: var(--gold);
+}
+
+.topbar p {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.admin-badge {
+    padding: 9px 14px;
+    border: 1px solid #66532e;
+    color: var(--gold);
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.dashboard-content {
+    padding: 30px;
+}
+
+.notice {
+    background: #302719;
+    border: 1px solid #66532e;
+    color: #e8c47c;
+    padding: 15px;
+    border-radius: 7px;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    font-size: 13px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 23px;
+    border-radius: 8px;
+}
+
+.stat-card p {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 15px;
+}
+
+.stat-card h2 {
+    color: var(--gold);
+    font-size: 29px;
+}
+
+.section-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 23px;
+    margin-bottom: 25px;
+}
+
+.section-panel h2 {
+    color: var(--gold);
+    font-size: 19px;
+    margin-bottom: 20px;
+}
+
+.section-description {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+    margin-top: -10px;
+    margin-bottom: 20px;
+}
+
+.admin-table-wrapper {
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 550px;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 15px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    font-size: 13px;
+}
+
+.admin-table th {
+    color: var(--gold);
+}
+
+.admin-table td {
+    color: #ccc;
+}
+
+.status {
+    display: inline-block;
+    padding: 5px 9px;
+    background: #302719;
+    color: var(--gold);
+    border-radius: 20px;
+    font-size: 11px;
+}
+
+.action-btn {
+    display: inline-block;
+    padding: 10px 15px;
+    border: 1px solid var(--gold);
+    border-radius: 5px;
+    color: var(--gold);
+    background: transparent;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.action-btn:hover {
+    background: var(--gold);
+    color: #111;
+}
+
+.empty-message {
+    color: var(--muted);
+    padding: 20px 0;
+    line-height: 1.6;
+}
+
+.admin-page {
+    display: none;
+}
+
+.admin-page.active {
+    display: block;
+}
+
+.quick-links {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.quick-link {
+    display: block;
+    padding: 20px;
+    background: #202020;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: white;
+    text-decoration: none;
+}
+
+.quick-link strong {
+    display: block;
+    color: var(--gold);
+    margin-bottom: 8px;
+}
+
+.quick-link span {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.mobile-menu {
+    display: none;
+    background: transparent;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    padding: 8px 12px;
+    border-radius: 5px;
+}
+
+@media(max-width: 1000px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 750px) {
+    .admin-layout {
+        display: block;
+    }
+
+    .sidebar {
+        display: none;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar.open {
+        display: block;
+    }
+
+    .mobile-menu {
+        display: block;
+    }
+
+    .topbar {
+        padding: 17px;
+    }
+
+    .dashboard-content {
+        padding: 18px;
+    }
+
+    .quick-links {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width: 450px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .topbar h1 {
+        font-size: 18px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <a href="index.html" class="admin-logo">
+            STAR<span>LUXE</span>
+        </a>
+
+        <p class="sidebar-label">MAIN MENU</p>
+
+        <button class="active" onclick="showPage('overview', this)">
+            ◈ Dashboard Overview
+        </button>
+
+        <button onclick="showPage('celebrities', this)">
+            ★ Celebrities
+        </button>
+
+        <button onclick="showPage('experiences', this)">
+            ✦ Experiences & Products
+        </button>
+
+        <p class="sidebar-label">MANAGEMENT</p>
+
+        <button onclick="showPage('orders', this)">
+            ▣ Orders
+        </button>
+
+        <button onclick="showPage('customers', this)">
+            ♙ Customers
+        </button>
+
+        <button onclick="showPage('payments', this)">
+            $ Payments
+        </button>
+
+        <p class="sidebar-label">PLATFORM</p>
+
+        <button onclick="showPage('reports', this)">
+            ▤ Reports
+        </button>
+
+        <button onclick="showPage('settings', this)">
+            ⚙ Settings
+        </button>
+
+        <p class="sidebar-label">WEBSITE</p>
+
+        <button onclick="location.href='index.html'">
+            ↗ View Website
+        </button>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="admin-main">
+
+        <header class="topbar">
+
+            <div style="display:flex;align-items:center;gap:14px;">
+
+                <button class="mobile-menu" onclick="toggleSidebar()">
+                    ☰
+                </button>
+
+                <div>
+                    <h1>Admin Dashboard</h1>
+                    <p>STARLUXE Marketplace Management</p>
+                </div>
+
+            </div>
+
+            <span class="admin-badge">
+                ADMIN PREVIEW
+            </span>
+
+        </header>
+
+
+        <div class="dashboard-content">
+
+            <div class="notice">
+                <strong>Development Preview:</strong>
+                This dashboard currently displays demonstration data.
+                It is not yet connected to the live database.
+                Secure administrator authentication and database permissions
+                must be configured before using it for real business operations.
+            </div>
+
+
+            <!-- OVERVIEW -->
+
+            <section class="admin-page active" id="overview">
+
+                <h2 style="color:#d6ad60;margin-bottom:22px;">
+                    Business Overview
+                </h2>
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+                        <p>Total Celebrities</p>
+                        <h2 id="celebrity-count">0</h2>
+                    </div>
+
+                    <div class="stat-card">
+                        <p>Total Experiences</p>
+                        <h2 id="experience-count">0</h2>
+                    </div>
+
+                    <div class="stat-card">
+                        <p>Total Orders</p>
+                        <h2>—</h2>
+                    </div>
+
+                    <div class="stat-card">
+                        <p>Total Revenue</p>
+                        <h2>—</h2>
+                    </div>
+
+                </div>
+
+
+                <div class="section-panel">
+
+                    <h2>Welcome to STARLUXE</h2>
+
+                    <p class="section-description">
+                        Manage your worldwide celebrity marketplace
+                        from one central administration area.
+                    </p>
+
+                    <div class="quick-links">
+
+                        <a href="#" class="quick-link"
+                           onclick="showPage('celebrities');return false;">
+
+                            <strong>Celebrity Management</strong>
+
+                            <span>View celebrity directory records.</span>
+
+                        </a>
+
+                        <a href="#" class="quick-link"
+                           onclick="showPage('experiences');return false;">
+
+                            <strong>Experience Management</strong>
+
+                            <span>Review experience listings.</span>
+
+                        </a>
+
+                        <a href="#" class="quick-link"
+                           onclick="showPage('orders');return false;">
+
+                            <strong>Order Management</strong>
+
+                            <span>Prepare to manage customer orders.</span>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <div class="section-panel">
+
+                    <h2>Recent Activity</h2>
+
+                    <p class="empty-message">
+                        Activity tracking will appear here after the
+                        database and administration system are connected.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- CELEBRITIES -->
+
+            <section class="admin-page" id="celebrities">
+
+                <div class="section-panel">
+
+                    <h2>Celebrity Management</h2>
+
+                    <p class="section-description">
+                        Review celebrity profiles currently included
+                        in the demonstration data.
+                    </p>
+
+                    <div class="admin-table-wrapper">
+
+                        <table class="admin-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Celebrity</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Verification</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="celebrity-table"></tbody>
+
+                        </table>
+
+                    </div>
+
+                    <p class="empty-message" id="celebrity-empty"></p>
+
+                </div>
+
+            </section>
+
+
+            <!-- EXPERIENCES -->
+
+            <section class="admin-page" id="experiences">
+
+                <div class="section-panel">
+
+                    <h2>Experiences & Products</h2>
+
+                    <p class="section-description">
+                        Review available demonstration experiences
+                        and their current publication status.
+                    </p>
+
+                    <div class="admin-table-wrapper">
+
+                        <table class="admin-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Experience</th>
+                                    <th>Type</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="experience-table"></tbody>
+
+                        </table>
+
+                    </div>
+
+                    <p class="empty-message" id="experience-empty"></p>
+
+                </div>
+
+            </section>
+
+
+            <!-- ORDERS -->
+
+            <section class="admin-page" id="orders">
+
+                <div class="section-panel">
+
+                    <h2>Customer Orders</h2>
+
+                    <p class="empty-message">
+                        No live order records are connected yet.
+                        Order management will become operational after
+                        the database and secure checkout are integrated.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- CUSTOMERS -->
+
+            <section class="admin-page" id="customers">
+
+                <div class="section-panel">
+
+                    <h2>Customer Management</h2>
+
+                    <p class="empty-message">
+                        Customer accounts and records will appear here
+                        after customer registration and database
+                        integration are completed.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- PAYMENTS -->
+
+            <section class="admin-page" id="payments">
+
+                <div class="section-panel">
+
+                    <h2>Payments & Transactions</h2>
+
+                    <p class="empty-message">
+                        Payment records, transaction references,
+                        refunds and payout management will be connected
+                        when the secure payment backend is implemented.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- REPORTS -->
+
+            <section class="admin-page" id="reports">
+
+                <div class="section-panel">
+
+                    <h2>Business Reports</h2>
+
+                    <p class="empty-message">
+                        Sales reports, platform commissions,
+                        celebrity performance and financial analytics
+                        will be available after real transactions
+                        are connected.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- SETTINGS -->
+
+            <section class="admin-page" id="settings">
+
+                <div class="section-panel">
+
+                    <h2>Platform Settings</h2>
+
+                    <div class="order-item">
+                        <span>Platform Name</span>
+                        <strong>STARLUXE</strong>
+                    </div>
+
+                    <div class="order-item">
+                        <span>Brand Tagline</span>
+                        <strong>Where Celebrity Meets Luxury</strong>
+                    </div>
+
+                    <div class="order-item">
+                        <span>Primary Currency</span>
+                        <strong>USD</strong>
+                    </div>
+
+                    <div class="order-item">
+                        <span>Payment Provider</span>
+                        <strong>Stripe — Integration Pending</strong>
+                    </div>
+
+                    <div class="order-item">
+                        <span>Database</span>
+                        <strong>Supabase — Integration Pending</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script src="data.js"></script>
+
+<script>
+
+function showPage(pageId, button) {
+
+    document.querySelectorAll(".admin-page").forEach(function(page) {
+
+        page.classList.remove("active");
+
+    });
+
+    const selectedPage = document.getElementById(pageId);
+
+    if (selectedPage) {
+        selectedPage.classList.add("active");
+    }
+
+    document.querySelectorAll(".sidebar button").forEach(function(item) {
+
+        item.classList.remove("active");
+
+    });
+
+    if (button) {
+        button.classList.add("active");
+    }
+
+    document.getElementById("sidebar").classList.remove("open");
+
+}
+
+
+function toggleSidebar() {
+
+    document.getElementById("sidebar").classList.toggle("open");
+
+}
+
+
+function escapeHTML(value) {
+
+    return String(value ?? "").replace(/[&<>"']/g, function(char) {
+
+        const entities = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        };
+
+        return entities[char];
+
+    });
+
+}
+
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    const DATA = window.STARLUXE_DATA || window.STARLUXE;
+
+    if (!DATA) {
+        return;
+    }
+
+
+    // Load celebrity records
+
+    const celebrities = DATA.getCelebrities();
+
+    document.getElementById("celebrity-count").textContent =
+        celebrities.length;
+
+    const celebrityTable = document.getElementById("celebrity-table");
+
+    if (celebrities.length) {
+
+        celebrityTable.innerHTML = celebrities.map(function(person) {
+
+            return `
+                <tr>
+
+                    <td>${escapeHTML(person.name || "Unnamed")}</td>
+
+                    <td>${escapeHTML(person.category || "Uncategorized")}</td>
+
+                    <td>
+                        <span class="status">
+                            ${escapeHTML(person.status || "Draft")}
+                        </span>
+                    </td>
+
+                    <td>
+                        ${person.verified ? "Verified" : "Not Verified"}
+                    </td>
+
+                </tr>
+            `;
+
+        }).join("");
+
+    } else {
+
+        document.getElementById("celebrity-empty").textContent =
+            "No celebrity records found.";
+
+    }
+
+
+    // Load experience records
+
+    const experiences = DATA.getOfferings();
+
+    document.getElementById("experience-count").textContent =
+        experiences.length;
+
+    const experienceTable = document.getElementById("experience-table");
+
+    if (experiences.length) {
+
+        experienceTable.innerHTML = experiences.map(function(item) {
+
+            const title = item.title || item.name || "Unnamed Experience";
+
+            const price = Number(item.price ?? item.selling_price ?? 0);
+
+            const currency = item.currency || "USD";
+
+            return `
+                <tr>
+
+                    <td>${escapeHTML(title)}</td>
+
+                    <td>${escapeHTML(item.type || "Uncategorized")}</td>
+
+                    <td>
+                        ${new Intl.NumberFormat("en-US", {
+                            style: "currency",
+                            currency: currency
+                        }).format(price)}
+                    </td>
+
+                    <td>
+                        <span class="status">
+                            ${escapeHTML(item.availability || "Draft")}
+                        </span>
+                    </td>
+
+                </tr>
+            `;
+
+        }).join("");
+
+    } else {
+
+        document.getElementById("experience-empty").textContent =
+            "No experience records found.";
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
