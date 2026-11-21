@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080808">
+
+    <title>Celebrity Profile | STARLUXE</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        .profile-hero {
+            padding: 75px 0;
+            background: linear-gradient(120deg, #111, #211a10);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 55px;
+            align-items: center;
+        }
+
+        .profile-image {
+            width: 100%;
+            height: 420px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+        }
+
+        .profile-details h1 {
+            font-size: clamp(38px, 5vw, 60px);
+            margin: 12px 0;
+        }
+
+        .profile-category {
+            color: var(--gold);
+            font-size: 11px;
+            letter-spacing: 3px;
+        }
+
+        .profile-description {
+            color: #aaa;
+            max-width: 650px;
+            margin: 20px 0;
+        }
+
+        .profile-country {
+            color: #ccc;
+            font-size: 13px;
+        }
+
+        .verified-badge {
+            display: inline-block;
+            color: var(--gold);
+            border: 1px solid var(--border);
+            padding: 7px 12px;
+            font-size: 11px;
+            margin-top: 15px;
+        }
+
+        .offerings-section {
+            padding: 85px 0;
+        }
+
+        .offerings-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 23px;
+            margin-top: 35px;
+        }
+
+        .offering-card {
+            background: var(--dark-card);
+            border: 1px solid #292929;
+            overflow: hidden;
+        }
+
+        .offering-card img {
+            height: 230px;
+            object-fit: cover;
+        }
+
+        .offering-content {
+            padding: 22px;
+        }
+
+        .offering-type {
+            color: var(--gold);
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .offering-content h3 {
+            font-size: 21px;
+            margin: 9px 0;
+        }
+
+        .offering-content p {
+            color: #aaa;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        .offering-price {
+            color: var(--gold);
+            font-size: 21px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .offering-content .btn {
+            width: 100%;
+        }
+
+        .empty-state {
+            background: #151515;
+            border: 1px solid #292929;
+            padding: 50px 20px;
+            text-align: center;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state p {
+            color: #aaa;
+            margin-top: 10px;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--gold);
+            margin-bottom: 25px;
+            font-size: 12px;
+        }
+
+        @media(max-width: 800px) {
+            .profile-layout {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .profile-image {
+                height: 350px;
+                max-width: 400px;
+            }
+
+            .offerings-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width: 520px) {
+            .offerings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="container nav-container">
+
+        <a href="index.html" class="logo">
+            STAR<span>LUXE</span>
+        </a>
+
+        <nav class="main-nav" id="mainNav">
+            <a href="index.html">Home</a>
+            <a href="celebrities.html" class="active">Celebrities</a>
+            <a href="experiences.html">Experiences</a>
+            <a href="index.html#about">About</a>
+            <a href="index.html#contact">Contact</a>
+        </nav>
+
+        <div class="nav-actions">
+            <a href="cart.html" class="cart-link">
+                Cart <span class="cart-count" id="cartCount">0</span>
+            </a>
+
+            <a href="experiences.html" class="nav-button">Explore Now</a>
+
+            <button class="menu-toggle" id="menuToggle" aria-label="Open navigation">
+                ☰
+            </button>
+        </div>
+
+    </div>
+</header>
+
+
+<main>
+
+    <section class="profile-hero">
+        <div class="container">
+
+            <a href="celebrities.html" class="back-link">
+                ← Back to Celebrities
+            </a>
+
+            <div id="profileContainer">
+                <div class="empty-state">
+                    <h2>Loading Celebrity Profile...</h2>
+                    <p>Please wait.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <section class="offerings-section">
+        <div class="container">
+
+            <span class="section-label">EXCLUSIVE OPPORTUNITIES</span>
+
+            <h2>Available <span>Experiences</span></h2>
+
+            <div class="offerings-grid" id="offeringsGrid">
+
+                <div class="empty-state">
+                    <h3>Loading Experiences...</h3>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+
+<footer class="site-footer">
+
+    <div class="container footer-grid">
+
+        <div class="footer-brand">
+            <a href="index.html" class="logo">
+                STAR<span>LUXE</span>
+            </a>
+
+            <p>
+                Where Celebrity Meets Luxury.
+                Discover exclusive experiences and extraordinary opportunities.
+            </p>
+        </div>
+
+        <div class="footer-column">
+            <h3>Explore</h3>
+            <a href="index.html">Home</a>
+            <a href="celebrities.html">Celebrities</a>
+            <a href="experiences.html">Experiences</a>
+            <a href="cart.html">Shopping Cart</a>
+        </div>
+
+        <div class="footer-column">
+            <h3>Information</h3>
+            <a href="index.html#about">About STARLUXE</a>
+            <a href="index.html#contact">Contact</a>
+        </div>
+
+        <div class="footer-column">
+            <h3>Support</h3>
+            <a href="mailto:support@starluxe.com">Customer Support</a>
+        </div>
+
+    </div>
+
+    <div class="container footer-bottom">
+        <p>© <span id="currentYear"></span> STARLUXE. All rights reserved.</p>
+        <p>Where Celebrity Meets Luxury.</p>
+    </div>
+
+</footer>
+
+
+<script src="data.js"></script>
+
+<script>
+    const menuToggle = document.getElementById("menuToggle");
+    const mainNav = document.getElementById("mainNav");
+
+    menuToggle.addEventListener("click", function() {
+        mainNav.classList.toggle("show");
+    });
+
+    document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
+
+
+    const parameters = new URLSearchParams(window.location.search);
+    const celebrityId = parameters.get("id");
+
+    const profileContainer =
+        document.getElementById("profileContainer");
+
+    const offeringsGrid =
+        document.getElementById("offeringsGrid");
+
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, function(character) {
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            }[character];
+        });
+    }
+
+
+    function loadCelebrity() {
+
+        if (!celebrityId) {
+            showNotFound();
+            return;
+        }
+
+        const celebrity = STARLUXE.getCelebrityById(celebrityId);
+
+        if (!celebrity || celebrity.status !== "published") {
+            showNotFound();
+            return;
+        }
+
+        document.title =
+            celebrity.name + " | STARLUXE";
+
+
+        profileContainer.innerHTML = `
+
+            <div class="profile-layout">
+
+                <img
+                    class="profile-image"
+                    src="${escapeHTML(celebrity.image)}"
+                    alt="${escapeHTML(celebrity.name)}"
+                >
+
+                <div class="profile-details">
+
+                    <span class="profile-category">
+                        ${escapeHTML(celebrity.category)}
+                    </span>
+
+                    <h1>${escapeHTML(celebrity.name)}</h1>
+
+                    <p class="profile-description">
+                        ${escapeHTML(celebrity.description)}
+                    </p>
+
+                    ${celebrity.country ? `
+                        <p class="profile-country">
+                            Location: ${escapeHTML(celebrity.country)}
+                        </p>
+                    ` : ""}
+
+                    ${celebrity.verified ? `
+                        <span class="verified-badge">
+                            ✓ VERIFIED PROFILE
+                        </span>
+                    ` : ""}
+
+                </div>
+
+            </div>
+
+        `;
+
+        loadOfferings(celebrity.id);
+
+    }
+
+
+    function loadOfferings(id) {
+
+        const offerings = STARLUXE
+            .getOfferingsByCelebrity(id)
+            .filter(item => item.availability === "available");
+
+        if (offerings.length === 0) {
+
+            offeringsGrid.innerHTML = `
+                <div class="empty-state">
+                    <h3>New Experiences Coming Soon</h3>
+                    <p>
+                        Exclusive products and experiences for this
+                        celebrity will appear here when available.
+                    </p>
+                </div>
+            `;
+
+            return;
+        }
+
+
+        offeringsGrid.innerHTML = offerings.map(item => `
+
+            <article class="offering-card">
+
+                <img
+                    src="${escapeHTML(item.image)}"
+                    alt="${escapeHTML(item.title)}"
+                    loading="lazy"
+                >
+
+                <div class="offering-content">
+
+                    <span class="offering-type">
+                        ${escapeHTML(item.type)}
+                    </span>
+
+                    <h3>${escapeHTML(item.title)}</h3>
+
+                    <p>${escapeHTML(item.description)}</p>
+
+                    <div class="offering-price">
+                        ${STARLUXE.formatPrice(item.price, item.currency)}
+                    </div>
+
+                    <button
+                        class="btn btn-gold"
+                        onclick="addToCart('${escapeHTML(item.id)}')"
+                    >
+                        Add to Cart
+                    </button>
+
+                </div>
+
+            </article>
+
+        `).join("");
+
+    }
+
+
+    function addToCart(id) {
+
+        const success = STARLUXE_CART.addItem(id);
+
+        if (success) {
+            updateCartCount();
+            alert("Item added to your STARLUXE cart!");
+        } else {
+            alert("Unable to add this item.");
+        }
+
+    }
+
+
+    function updateCartCount() {
+
+        document.getElementById("cartCount").textContent =
+            STARLUXE_CART.getCount();
+
+    }
+
+
+    function showNotFound() {
+
+        profileContainer.innerHTML = `
+            <div class="empty-state">
+                <h2>Profile Not Available</h2>
+                <p>
+                    This celebrity profile may not exist or has not
+                    been published yet.
+                </p>
+                <a href="celebrities.html" class="btn btn-gold">
+                    Explore Celebrities
+                </a>
+            </div>
+        `;
+
+        offeringsGrid.innerHTML = "";
+
+    }
+
+
+    loadCelebrity();
+    updateCartCount();
+
+</script>
+
+</body>
+</html>
