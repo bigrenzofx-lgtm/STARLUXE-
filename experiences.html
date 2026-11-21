@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Celebrity Experiences | STARLUXE</title>
+
+<link rel="stylesheet" href="styles.css">
+
+<style>
+.experiences-hero {
+    padding: 100px 20px 70px;
+    text-align: center;
+    background: linear-gradient(135deg, #111, #211a0c);
+}
+
+.experiences-hero h1 {
+    font-size: clamp(35px, 6vw, 65px);
+    color: #d6ad60;
+    margin-bottom: 15px;
+}
+
+.experiences-hero p {
+    max-width: 650px;
+    margin: auto;
+    color: #ccc;
+    line-height: 1.8;
+}
+
+.marketplace {
+    padding: 65px 5%;
+    max-width: 1400px;
+    margin: auto;
+}
+
+.marketplace-heading {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.marketplace-heading h2 {
+    color: #d6ad60;
+    font-size: 32px;
+}
+
+.marketplace-heading p {
+    color: #aaa;
+    margin-top: 10px;
+}
+
+.filters {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 35px;
+}
+
+.filters input,
+.filters select {
+    width: 100%;
+    padding: 14px;
+    background: #171717;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 6px;
+    outline: none;
+}
+
+.filters input:focus,
+.filters select:focus {
+    border-color: #d6ad60;
+}
+
+.experience-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.experience-card {
+    background: #151515;
+    border: 1px solid #292929;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+.experience-card:hover {
+    transform: translateY(-6px);
+    border-color: #d6ad60;
+}
+
+.experience-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    background: #252525;
+}
+
+.experience-info {
+    padding: 22px;
+}
+
+.experience-type {
+    color: #d6ad60;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.experience-info h3 {
+    color: white;
+    margin: 12px 0;
+    font-size: 21px;
+}
+
+.experience-info p {
+    color: #aaa;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.experience-price {
+    color: #d6ad60;
+    font-size: 22px;
+    font-weight: bold;
+    margin: 18px 0;
+}
+
+.experience-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.experience-actions a,
+.experience-actions button {
+    flex: 1;
+    text-align: center;
+    padding: 12px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.view-btn {
+    border: 1px solid #d6ad60;
+    color: #d6ad60;
+    background: transparent;
+}
+
+.cart-btn {
+    background: #d6ad60;
+    color: #111;
+    border: none;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 65px 20px;
+    color: #aaa;
+    grid-column: 1 / -1;
+}
+
+.empty-state h3 {
+    color: #d6ad60;
+    margin-bottom: 12px;
+}
+
+.marketplace-note {
+    margin-top: 45px;
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+@media(max-width: 900px) {
+    .experience-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 650px) {
+    .experience-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filters {
+        grid-template-columns: 1fr;
+    }
+
+    .experiences-hero {
+        padding: 75px 20px 55px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="container header-inner">
+
+        <a href="index.html" class="logo">
+            STAR<span>LUXE</span>
+        </a>
+
+        <button class="menu-toggle" aria-label="Open navigation">
+            ☰
+        </button>
+
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="celebrities.html">Celebrities</a>
+            <a href="experiences.html">Experiences</a>
+            <a href="index.html#about">About</a>
+            <a href="index.html#contact">Contact</a>
+            <a href="cart.html">
+                Cart (<span id="cart-count">0</span>)
+            </a>
+        </nav>
+
+    </div>
+</header>
+
+
+<section class="experiences-hero">
+
+    <h1>EXCLUSIVE EXPERIENCES</h1>
+
+    <p>
+        Go beyond being a fan. Discover extraordinary opportunities
+        to connect with celebrities through exclusive events,
+        private experiences, luxury getaways and unforgettable moments.
+    </p>
+
+</section>
+
+
+<main class="marketplace">
+
+    <div class="marketplace-heading">
+        <h2>Explore the Marketplace</h2>
+        <p>Discover experiences designed to bring you closer to the stars.</p>
+    </div>
+
+
+    <div class="filters">
+
+        <input
+            type="search"
+            id="search-input"
+            placeholder="Search experiences..."
+        >
+
+        <select id="category-filter">
+            <option value="">All Categories</option>
+            <option value="meet-and-greet">Meet & Greets</option>
+            <option value="events">VIP Events</option>
+            <option value="merchandise">Merchandise</option>
+            <option value="vacations">Luxury Vacations</option>
+            <option value="private-dining">Private Dining</option>
+            <option value="performances">Performances</option>
+            <option value="fan-cards">Fan Cards</option>
+            <option value="autographed-items">Autographed Items</option>
+        </select>
+
+        <select id="sort-filter">
+            <option value="default">Sort Experiences</option>
+            <option value="low">Price: Low to High</option>
+            <option value="high">Price: High to Low</option>
+        </select>
+
+    </div>
+
+
+    <div class="experience-grid" id="experience-grid">
+
+        <div class="empty-state">
+            <h3>Loading Experiences...</h3>
+            <p>Please wait while we explore the marketplace.</p>
+        </div>
+
+    </div>
+
+
+    <div class="marketplace-note">
+        STARLUXE experiences and products are subject to availability,
+        confirmation and applicable booking conditions.
+    </div>
+
+</main>
+
+
+<footer class="site-footer">
+    <div class="container">
+
+        <div class="footer-content">
+
+            <div>
+                <a href="index.html" class="logo">
+                    STAR<span>LUXE</span>
+                </a>
+
+                <p>Where Celebrity Meets Luxury.</p>
+            </div>
+
+            <div>
+                <h4>Explore</h4>
+                <a href="celebrities.html">Celebrities</a>
+                <a href="experiences.html">Experiences</a>
+                <a href="cart.html">Shopping Cart</a>
+            </div>
+
+            <div>
+                <h4>Information</h4>
+                <a href="index.html#about">About Us</a>
+                <a href="index.html#contact">Contact</a>
+            </div>
+
+        </div>
+
+        <p class="copyright">
+            © <span id="current-year"></span> STARLUXE.
+            All rights reserved.
+        </p>
+
+    </div>
+</footer>
+
+
+<script src="data.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    const DATA = window.STARLUXE_DATA || window.STARLUXE;
+
+    const grid = document.getElementById("experience-grid");
+    const searchInput = document.getElementById("search-input");
+    const categoryFilter = document.getElementById("category-filter");
+    const sortFilter = document.getElementById("sort-filter");
+
+    document.getElementById("current-year").textContent =
+        new Date().getFullYear();
+
+
+    // Update cart counter
+    function updateCartCount() {
+
+        if (window.STARLUXE_CART) {
+
+            document.getElementById("cart-count").textContent =
+                window.STARLUXE_CART.getCount();
+
+        }
+
+    }
+
+
+    // Safely retrieve published experiences
+    function getExperiences() {
+
+        if (!DATA || typeof DATA.getOfferings !== "function") {
+            return [];
+        }
+
+        return DATA.getOfferings().filter(function(item) {
+
+            return item.availability === "available";
+
+        });
+
+    }
+
+
+    // Format experience prices
+    function formatPrice(price, currency) {
+
+        if (DATA && typeof DATA.formatPrice === "function") {
+            return DATA.formatPrice(price, currency || "USD");
+        }
+
+        return new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: currency || "USD"
+        }).format(Number(price) || 0);
+
+    }
+
+
+    // Display marketplace experiences
+    function displayExperiences() {
+
+        let experiences = getExperiences();
+
+        const search = searchInput.value.toLowerCase().trim();
+        const category = categoryFilter.value;
+        const sort = sortFilter.value;
+
+
+        // Search filter
+        experiences = experiences.filter(function(item) {
+
+            const searchableText = [
+                item.title,
+                item.name,
+                item.type,
+                item.description,
+                item.category
+            ].join(" ").toLowerCase();
+
+            return searchableText.includes(search);
+
+        });
+
+
+        // Category filter
+        if (category) {
+
+            experiences = experiences.filter(function(item) {
+
+                return item.type === category ||
+                       item.category === category;
+
+            });
+
+        }
+
+
+        // Price sorting
+        if (sort === "low") {
+
+            experiences.sort(function(a, b) {
+                return Number(a.price || 0) - Number(b.price || 0);
+            });
+
+        }
+
+        if (sort === "high") {
+
+            experiences.sort(function(a, b) {
+                return Number(b.price || 0) - Number(a.price || 0);
+            });
+
+        }
+
+
+        // Empty marketplace
+        if (experiences.length === 0) {
+
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <h3>No Experiences Available Yet</h3>
+
+                    <p>
+                        Our exclusive celebrity experiences will appear here
+                        once they have been published.
+                    </p>
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        // Build experience cards
+        grid.innerHTML = experiences.map(function(item) {
+
+            const title = item.title || item.name || "Exclusive Experience";
+
+            const description = item.description ||
+                "Discover an exclusive STARLUXE experience.";
+
+            const image = item.image ||
+                (Array.isArray(item.image_urls) ? item.image_urls[0] : "") ||
+                "https://placehold.co/600x400/171717/d6ad60?text=STARLUXE";
+
+            const price = item.price ??
+                item.selling_price ??
+                0;
+
+            const currency = item.currency || "USD";
+
+            const type = (item.type || item.category || "Exclusive")
+                .replaceAll("-", " ");
+
+            const id = item.id || "";
+
+
+            return `
+
+                <article class="experience-card">
+
+                    <img
+                        src="${escapeHTML(image)}"
+                        alt="${escapeHTML(title)}"
+                        class="experience-image"
+                        onerror="this.src='https://placehold.co/600x400/171717/d6ad60?text=STARLUXE'"
+                    >
+
+                    <div class="experience-info">
+
+                        <span class="experience-type">
+                            ${escapeHTML(type)}
+                        </span>
+
+                        <h3>${escapeHTML(title)}</h3>
+
+                        <p>${escapeHTML(description)}</p>
+
+                        <div class="experience-price">
+                            ${formatPrice(price, currency)}
+                        </div>
+
+                        <div class="experience-actions">
+
+                            <a
+                                class="view-btn"
+                                href="celebrity.html?id=${encodeURIComponent(item.celebrity_id || "")}"
+                            >
+                                View Details
+                            </a>
+
+                            <button
+                                class="cart-btn"
+                                onclick="addExperienceToCart('${escapeHTML(id)}')"
+                            >
+                                Add to Cart
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            `;
+
+        }).join("");
+
+    }
+
+
+    // Escape text before placing it in HTML
+    function escapeHTML(value) {
+
+        return String(value ?? "").replace(/[&<>"']/g, function(char) {
+
+            const entities = {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            };
+
+            return entities[char];
+
+        });
+
+    }
+
+
+    // Add experience to cart
+    window.addExperienceToCart = function(id) {
+
+        const item = getExperiences().find(function(experience) {
+
+            return String(experience.id) === String(id);
+
+        });
+
+        if (!item) {
+            alert("This experience is currently unavailable.");
+            return;
+        }
+
+        if (!window.STARLUXE_CART) {
+
+            alert("Shopping cart is not available. Please refresh the page.");
+            return;
+
+        }
+
+        window.STARLUXE_CART.addItem(item);
+
+        updateCartCount();
+
+        alert("Experience added to your cart!");
+
+    };
+
+
+    // Filter events
+    searchInput.addEventListener("input", displayExperiences);
+
+    categoryFilter.addEventListener("change", displayExperiences);
+
+    sortFilter.addEventListener("change", displayExperiences);
+
+
+    // Mobile navigation
+    const menuButton = document.querySelector(".menu-toggle");
+    const navigation = document.querySelector(".main-nav");
+
+    if (menuButton && navigation) {
+
+        menuButton.addEventListener("click", function() {
+            navigation.classList.toggle("active");
+        });
+
+    }
+
+
+    updateCartCount();
+
+    displayExperiences();
+
+});
+
+</script>
+
+</body>
+</html>
