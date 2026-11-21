@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STARLUXE Connection Test</title>
+    <style>
+        body {
+            background: #090909;
+            color: #d6ad60;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .box {
+            max-width: 450px;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #b68b42;
+            border-radius: 12px;
+        }
+
+        #result {
+            color: white;
+            line-height: 1.7;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h1>STARLUXE</h1>
+    <h3>Database Connection Test</h3>
+    <p id="result">Connecting to Supabase...</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+
+<script>
+async function testConnection() {
+    const result = document.getElementById("result");
+
+    try {
+        const { data, error } =
+            await window.STARLUXE_SUPABASE
+                .from("celebrities")
+                .select("id")
+                .limit(1);
+
+        if (error) throw error;
+
+        result.innerHTML =
+            "SUCCESS! STARLUXE is connected to Supabase.<br>" +
+            "Database communication is working.";
+
+    } catch (error) {
+        result.innerHTML =
+            "CONNECTION ERROR:<br>" + error.message;
+    }
+}
+
+testConnection();
+</script>
+
+</body>
+</html>
