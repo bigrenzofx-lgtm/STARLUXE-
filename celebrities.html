@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discover celebrities and explore exclusive STARLUXE experiences.">
+    <meta name="theme-color" content="#080808">
+
+    <title>Explore Celebrities | STARLUXE</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        .page-hero {
+            padding: 85px 0;
+            background: linear-gradient(90deg, #080808, #17130c);
+            border-bottom: 1px solid rgba(214,173,96,.2);
+        }
+
+        .page-hero h1 {
+            font-size: clamp(40px, 6vw, 65px);
+        }
+
+        .page-hero p {
+            color: #aaa;
+            max-width: 600px;
+            margin-top: 15px;
+        }
+
+        .directory-section {
+            padding: 65px 0 100px;
+        }
+
+        .directory-tools {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 35px;
+        }
+
+        .directory-tools input,
+        .directory-tools select {
+            background: #151515;
+            color: white;
+            border: 1px solid #333;
+            padding: 14px;
+            outline: none;
+            min-width: 180px;
+        }
+
+        .directory-tools input {
+            flex: 1;
+        }
+
+        .directory-tools input:focus,
+        .directory-tools select:focus {
+            border-color: #d6ad60;
+        }
+
+        .directory-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .directory-card {
+            background: #151515;
+            border: 1px solid #292929;
+            overflow: hidden;
+            transition: .3s;
+        }
+
+        .directory-card:hover {
+            border-color: #d6ad60;
+            transform: translateY(-5px);
+        }
+
+        .directory-card img {
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .directory-info {
+            padding: 23px;
+        }
+
+        .directory-info small {
+            color: #d6ad60;
+            letter-spacing: 2px;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .directory-info h2 {
+            font-size: 23px;
+            margin: 8px 0;
+        }
+
+        .directory-info p {
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        .directory-info .btn {
+            margin-top: 18px;
+        }
+
+        .verified-label {
+            color: #d6ad60;
+            font-size: 11px;
+            display: block;
+            margin-top: 8px;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 65px 20px;
+            background: #151515;
+            border: 1px solid #292929;
+        }
+
+        .empty-state h2 {
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            color: #aaa;
+        }
+
+        @media(max-width: 750px) {
+            .directory-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width: 500px) {
+            .directory-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .directory-tools {
+                flex-direction: column;
+            }
+
+            .directory-tools input,
+            .directory-tools select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="container nav-container">
+
+        <a href="index.html" class="logo">
+            STAR<span>LUXE</span>
+        </a>
+
+        <nav class="main-nav" id="mainNav">
+            <a href="index.html">Home</a>
+            <a href="celebrities.html" class="active">Celebrities</a>
+            <a href="experiences.html">Experiences</a>
+            <a href="index.html#about">About</a>
+            <a href="index.html#contact">Contact</a>
+        </nav>
+
+        <div class="nav-actions">
+            <a href="cart.html" class="cart-link">
+                Cart <span class="cart-count" id="cartCount">0</span>
+            </a>
+
+            <a href="experiences.html" class="nav-button">Explore Now</a>
+
+            <button class="menu-toggle" id="menuToggle" aria-label="Open navigation">
+                ☰
+            </button>
+        </div>
+
+    </div>
+</header>
+
+
+<main>
+
+    <section class="page-hero">
+        <div class="container">
+
+            <span class="section-label">MEET THE STARS</span>
+
+            <h1>Discover <span>Celebrities</span></h1>
+
+            <p>
+                Explore personalities from around the world and discover
+                exclusive products, opportunities and unforgettable experiences.
+            </p>
+
+        </div>
+    </section>
+
+
+    <section class="directory-section">
+
+        <div class="container">
+
+            <div class="directory-tools">
+
+                <input
+                    type="search"
+                    id="celebritySearch"
+                    placeholder="Search celebrities..."
+                    aria-label="Search celebrities"
+                >
+
+                <select id="categoryFilter" aria-label="Filter by category">
+                    <option value="">All Categories</option>
+                </select>
+
+            </div>
+
+
+            <div class="directory-grid" id="celebrityGrid">
+
+                <div class="empty-state">
+                    <h2>Loading Celebrities...</h2>
+                    <p>Please wait.</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer class="site-footer" id="contact">
+
+    <div class="container footer-grid">
+
+        <div class="footer-brand">
+
+            <a href="index.html" class="logo">
+                STAR<span>LUXE</span>
+            </a>
+
+            <p>
+                Where Celebrity Meets Luxury.
+                Discover exclusive experiences and extraordinary opportunities.
+            </p>
+
+        </div>
+
+        <div class="footer-column">
+            <h3>Explore</h3>
+            <a href="index.html">Home</a>
+            <a href="celebrities.html">Celebrities</a>
+            <a href="experiences.html">Experiences</a>
+            <a href="cart.html">Shopping Cart</a>
+        </div>
+
+        <div class="footer-column">
+            <h3>Information</h3>
+            <a href="index.html#about">About STARLUXE</a>
+            <a href="index.html#contact">Contact</a>
+        </div>
+
+        <div class="footer-column">
+            <h3>Support</h3>
+            <a href="mailto:support@starluxe.com">Customer Support</a>
+            <a href="mailto:partners@starluxe.com">Partnership Enquiries</a>
+        </div>
+
+    </div>
+
+    <div class="container footer-bottom">
+        <p>© <span id="currentYear"></span> STARLUXE. All rights reserved.</p>
+        <p>Where Celebrity Meets Luxury.</p>
+    </div>
+
+</footer>
+
+
+<script src="data.js"></script>
+
+<script>
+    const menuToggle = document.getElementById("menuToggle");
+    const mainNav = document.getElementById("mainNav");
+
+    menuToggle.addEventListener("click", function() {
+        mainNav.classList.toggle("show");
+    });
+
+    document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
+
+
+    const celebrityGrid = document.getElementById("celebrityGrid");
+    const searchInput = document.getElementById("celebritySearch");
+    const categoryFilter = document.getElementById("categoryFilter");
+
+
+    function loadCategories() {
+
+        STARLUXE.getCategories().forEach(category => {
+
+            const option = document.createElement("option");
+
+            option.value = category.id;
+            option.textContent = category.name;
+
+            categoryFilter.appendChild(option);
+
+        });
+
+    }
+
+
+    function renderCelebrities() {
+
+        const search = searchInput.value.toLowerCase();
+        const category = categoryFilter.value;
+
+        const celebrities = STARLUXE.getCelebrities().filter(celebrity => {
+
+            const matchesSearch =
+                celebrity.name.toLowerCase().includes(search) ||
+                celebrity.category.toLowerCase().includes(search);
+
+            const matchesCategory =
+                !category || celebrity.categoryId === category;
+
+            return matchesSearch &&
+                   matchesCategory &&
+                   celebrity.status === "published";
+
+        });
+
+
+        if (celebrities.length === 0) {
+
+            celebrityGrid.innerHTML = `
+                <div class="empty-state">
+                    <h2>Discoveries Coming Soon</h2>
+                    <p>
+                        No published celebrity profiles match your search.
+                        Check back as new personalities join STARLUXE.
+                    </p>
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        celebrityGrid.innerHTML = celebrities.map(celebrity => `
+
+            <article class="directory-card">
+
+                <img
+                    src="${escapeHTML(celebrity.image)}"
+                    alt="${escapeHTML(celebrity.name)}"
+                    loading="lazy"
+                >
+
+                <div class="directory-info">
+
+                    <small>${escapeHTML(celebrity.category)}</small>
+
+                    <h2>${escapeHTML(celebrity.name)}</h2>
+
+                    <p>${escapeHTML(celebrity.description)}</p>
+
+                    ${celebrity.verified
+                        ? '<span class="verified-label">✓ Verified profile</span>'
+                        : ''
+                    }
+
+                    <a
+                        href="celebrity.html?id=${encodeURIComponent(celebrity.id)}"
+                        class="btn btn-gold"
+                    >
+                        View Profile
+                    </a>
+
+                </div>
+
+            </article>
+
+        `).join("");
+
+    }
+
+
+    function escapeHTML(value) {
+
+        return String(value ?? "").replace(/[&<>"']/g, function(character) {
+
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            }[character];
+
+        });
+
+    }
+
+
+    searchInput.addEventListener("input", renderCelebrities);
+    categoryFilter.addEventListener("change", renderCelebrities);
+
+
+    if (window.STARLUXE) {
+
+        loadCategories();
+        renderCelebrities();
+
+    } else {
+
+        celebrityGrid.innerHTML = `
+            <div class="empty-state">
+                <h2>Unable to load profiles</h2>
+                <p>Please refresh the page.</p>
+            </div>
+        `;
+
+    }
+
+
+    const cartCount = document.getElementById("cartCount");
+
+    if (cartCount && window.STARLUXE_CART) {
+        cartCount.textContent = STARLUXE_CART.getCount();
+    }
+
+</script>
+
+</body>
+</html>
