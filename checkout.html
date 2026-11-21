@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Secure Checkout | STARLUXE</title>
+
+<link rel="stylesheet" href="styles.css">
+
+<style>
+.checkout-section {
+    max-width: 1150px;
+    margin: auto;
+    padding: 65px 20px 90px;
+}
+
+.checkout-heading {
+    text-align: center;
+    margin-bottom: 45px;
+}
+
+.checkout-heading h1 {
+    color: #d6ad60;
+    font-size: clamp(32px, 5vw, 48px);
+}
+
+.checkout-heading p {
+    color: #aaa;
+    margin-top: 12px;
+}
+
+.checkout-layout {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+.checkout-panel,
+.order-panel {
+    background: #151515;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 28px;
+}
+
+.checkout-panel h2,
+.order-panel h2 {
+    color: #d6ad60;
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #ddd;
+    margin-bottom: 9px;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 14px;
+    background: #202020;
+    border: 1px solid #444;
+    border-radius: 5px;
+    color: white;
+    font-size: 15px;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #d6ad60;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.required {
+    color: #d6ad60;
+}
+
+.terms {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: #aaa;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 22px 0;
+}
+
+.terms input {
+    margin-top: 4px;
+    accent-color: #d6ad60;
+}
+
+.place-order-btn {
+    width: 100%;
+    padding: 16px;
+    background: #d6ad60;
+    color: #111;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.place-order-btn:hover {
+    background: #e8c47c;
+}
+
+.checkout-note {
+    color: #888;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.6;
+    margin-top: 15px;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    border-bottom: 1px solid #333;
+    padding: 15px 0;
+    color: #ccc;
+    font-size: 14px;
+}
+
+.order-item strong {
+    color: #d6ad60;
+    white-space: nowrap;
+}
+
+.order-totals {
+    margin-top: 25px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 17px;
+    color: #aaa;
+}
+
+.total-row strong {
+    color: white;
+}
+
+.grand-total {
+    border-top: 1px solid #444;
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+.grand-total strong {
+    color: #d6ad60;
+    font-size: 22px;
+}
+
+.empty-checkout {
+    text-align: center;
+    padding: 50px 20px;
+    background: #151515;
+    border: 1px solid #333;
+    border-radius: 10px;
+}
+
+.empty-checkout h2 {
+    color: #d6ad60;
+    margin-bottom: 15px;
+}
+
+.empty-checkout p {
+    color: #aaa;
+    margin-bottom: 25px;
+}
+
+.empty-checkout a {
+    display: inline-block;
+    padding: 13px 25px;
+    background: #d6ad60;
+    color: #111;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.status-message {
+    display: none;
+    padding: 18px;
+    margin-top: 20px;
+    background: #252015;
+    border: 1px solid #d6ad60;
+    color: #e8c47c;
+    border-radius: 6px;
+    line-height: 1.6;
+}
+
+@media(max-width: 800px) {
+    .checkout-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width: 500px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .checkout-panel,
+    .order-panel {
+        padding: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="site-header">
+
+    <div class="container header-inner">
+
+        <a href="index.html" class="logo">
+            STAR<span>LUXE</span>
+        </a>
+
+        <button class="menu-toggle" aria-label="Open navigation">
+            ☰
+        </button>
+
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="celebrities.html">Celebrities</a>
+            <a href="experiences.html">Experiences</a>
+            <a href="cart.html">
+                Cart (<span id="cart-count">0</span>)
+            </a>
+        </nav>
+
+    </div>
+
+</header>
+
+
+<main class="checkout-section">
+
+    <div class="checkout-heading">
+
+        <h1>SECURE CHECKOUT</h1>
+
+        <p>
+            You're one step closer to an extraordinary experience.
+            Complete your details below.
+        </p>
+
+    </div>
+
+    <div id="checkout-content"></div>
+
+</main>
+
+
+<footer class="site-footer">
+
+    <div class="container">
+
+        <div class="footer-content">
+
+            <div>
+                <a href="index.html" class="logo">
+                    STAR<span>LUXE</span>
+                </a>
+
+                <p>Where Celebrity Meets Luxury.</p>
+            </div>
+
+            <div>
+                <h4>Explore</h4>
+                <a href="celebrities.html">Celebrities</a>
+                <a href="experiences.html">Experiences</a>
+            </div>
+
+            <div>
+                <h4>Shopping</h4>
+                <a href="cart.html">Shopping Cart</a>
+                <a href="checkout.html">Checkout</a>
+            </div>
+
+        </div>
+
+        <p class="copyright">
+            © <span id="current-year"></span> STARLUXE.
+            All rights reserved.
+        </p>
+
+    </div>
+
+</footer>
+
+
+<script src="data.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    const cart = window.STARLUXE_CART;
+
+    const content = document.getElementById("checkout-content");
+
+    document.getElementById("current-year").textContent =
+        new Date().getFullYear();
+
+
+    function escapeHTML(value) {
+
+        return String(value ?? "").replace(/[&<>"']/g, function(char) {
+
+            const entities = {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            };
+
+            return entities[char];
+
+        });
+
+    }
+
+
+    function getItems() {
+
+        return cart ? cart.getItems() : [];
+
+    }
+
+
+    function getPrice(item) {
+
+        return Number(item.price ?? item.selling_price ?? 0);
+
+    }
+
+
+    function getCurrency(item) {
+
+        return item.currency || "USD";
+
+    }
+
+
+    function formatPrice(amount, currency) {
+
+        return new Intl.NumberFormat("en-US", {
+
+            style: "currency",
+            currency: currency || "USD"
+
+        }).format(Number(amount) || 0);
+
+    }
+
+
+    function renderCheckout() {
+
+        if (!cart) {
+
+            content.innerHTML = `
+                <div class="empty-checkout">
+                    <h2>Checkout Unavailable</h2>
+                    <p>Please refresh the page and try again.</p>
+                    <a href="cart.html">Return to Cart</a>
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        const items = getItems();
+
+        document.getElementById("cart-count").textContent =
+            cart.getCount();
+
+
+        if (!items.length) {
+
+            content.innerHTML = `
+                <div class="empty-checkout">
+                    <h2>Your Cart Is Empty</h2>
+
+                    <p>
+                        Add an experience or product before proceeding
+                        to checkout.
+                    </p>
+
+                    <a href="experiences.html">
+                        Explore Experiences
+                    </a>
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        const currencies = [...new Set(items.map(getCurrency))];
+
+
+        if (currencies.length !== 1) {
+
+            content.innerHTML = `
+                <div class="empty-checkout">
+                    <h2>Currency Mismatch</h2>
+
+                    <p>
+                        Please return to your cart and make sure
+                        all selected items use the same currency.
+                    </p>
+
+                    <a href="cart.html">Return to Cart</a>
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        const currency = currencies[0];
+
+        const subtotal = items.reduce(function(total, item) {
+
+            return total + getPrice(item);
+
+        }, 0);
+
+
+        const orderItems = items.map(function(item) {
+
+            const title = item.title ||
+                item.name ||
+                "STARLUXE Experience";
+
+            return `
+                <div class="order-item">
+
+                    <span>${escapeHTML(title)}</span>
+
+                    <strong>
+                        ${formatPrice(getPrice(item), currency)}
+                    </strong>
+
+                </div>
+            `;
+
+        }).join("");
+
+
+        content.innerHTML = `
+
+            <div class="checkout-layout">
+
+                <section class="checkout-panel">
+
+                    <h2>Customer Information</h2>
+
+                    <form id="checkout-form">
+
+                        <div class="form-group">
+
+                            <label for="full-name">
+                                Full Name <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                id="full-name"
+                                name="fullName"
+                                placeholder="Enter your full name"
+                                autocomplete="name"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-row">
+
+                            <div class="form-group">
+
+                                <label for="email">
+                                    Email Address
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    placeholder="you@example.com"
+                                    autocomplete="email"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="phone">
+                                    Phone Number
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    placeholder="+1 000 000 0000"
+                                    autocomplete="tel"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="country">
+                                Country <span class="required">*</span>
+                            </label>
+
+                            <select id="country" name="country" required>
+
+                                <option value="">Select your country</option>
+
+                                <option>Nigeria</option>
+                                <option>United States</option>
+                                <option>United Kingdom</option>
+                                <option>Canada</option>
+                                <option>Germany</option>
+                                <option>France</option>
+                                <option>Australia</option>
+                                <option>South Africa</option>
+                                <option>Ghana</option>
+                                <option>United Arab Emirates</option>
+                                <option>Other</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="address">
+                                Address
+                            </label>
+
+                            <input
+                                type="text"
+                                id="address"
+                                name="address"
+                                placeholder="Enter your address"
+                                autocomplete="street-address"
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="notes">
+                                Special Requests or Additional Information
+                            </label>
+
+                            <textarea
+                                id="notes"
+                                name="notes"
+                                placeholder="Tell us about any special requirements..."
+                            ></textarea>
+
+                        </div>
+
+
+                        <label class="terms">
+
+                            <input
+                                type="checkbox"
+                                id="terms"
+                                required
+                            >
+
+                            <span>
+                                I confirm that my information is accurate
+                                and agree to the applicable booking and
+                                purchase conditions.
+                            </span>
+
+                        </label>
+
+
+                        <button
+                            type="submit"
+                            class="place-order-btn"
+                        >
+                            Continue to Payment
+                        </button>
+
+
+                        <p class="checkout-note">
+                            Payment processing will be securely connected
+                            through STARLUXE's payment system.
+                        </p>
+
+
+                        <div
+                            id="status-message"
+                            class="status-message"
+                            role="status"
+                        ></div>
+
+                    </form>
+
+                </section>
+
+
+                <aside class="order-panel">
+
+                    <h2>Your Order</h2>
+
+                    ${orderItems}
+
+                    <div class="order-totals">
+
+                        <div class="total-row">
+                            <span>Items</span>
+                            <strong>${items.length}</strong>
+                        </div>
+
+                        <div class="total-row">
+                            <span>Subtotal</span>
+                            <strong>
+                                ${formatPrice(subtotal, currency)}
+                            </strong>
+                        </div>
+
+                        <div class="total-row">
+                            <span>Additional Fees</span>
+                            <strong>Calculated later</strong>
+                        </div>
+
+                        <div class="total-row grand-total">
+                            <span>Order Subtotal</span>
+
+                            <strong>
+                                ${formatPrice(subtotal, currency)}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <a
+                        href="cart.html"
+                        style="
+                            display:block;
+                            text-align:center;
+                            color:#d6ad60;
+                            margin-top:25px;
+                            text-decoration:none;
+                        "
+                    >
+                        Edit Shopping Cart
+                    </a>
+
+                </aside>
+
+            </div>
+
+        `;
+
+
+        // Checkout form demonstration
+        const form = document.getElementById("checkout-form");
+
+        form.addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            if (!form.reportValidity()) {
+                return;
+            }
+
+            const status = document.getElementById("status-message");
+
+            status.style.display = "block";
+
+            status.textContent =
+                "Your checkout information has been validated in this demonstration. " +
+                "Real order creation, email confirmation and Stripe payment " +
+                "are not connected yet. Your order has NOT been placed or charged.";
+
+            status.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+        });
+
+    }
+
+
+    // Mobile navigation
+    const menuButton = document.querySelector(".menu-toggle");
+
+    const navigation = document.querySelector(".main-nav");
+
+    if (menuButton && navigation) {
+
+        menuButton.addEventListener("click", function() {
+
+            navigation.classList.toggle("active");
+
+        });
+
+    }
+
+
+    renderCheckout();
+
+});
+
+</script>
+
+</body>
+</html>
