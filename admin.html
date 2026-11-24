@@ -1,879 +1,827 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>STARLUXE | Admin Dashboard</title>
-
-<link rel="stylesheet" href="styles.css">
+<meta name="robots" content="noindex,nofollow">
 
 <style>
-:root {
-    --gold: #d6ad60;
-    --dark: #101010;
-    --panel: #191919;
-    --border: #303030;
-    --muted: #999;
+:root{
+  --bg:#080808;--panel:#111;--gold:#d6ad55;--gold2:#f1d58b;
+  --text:#f5f2eb;--muted:#aaa;--border:#292929;
+  --red:#e46b6b;--green:#70c99a;
 }
-
-body {
-    background: #101010;
-    color: white;
-}
-
-.admin-layout {
-    display: flex;
-    min-height: 100vh;
-}
-
-.sidebar {
-    width: 250px;
-    background: #151515;
-    border-right: 1px solid var(--border);
-    padding: 25px 18px;
-    flex-shrink: 0;
-}
-
-.admin-logo {
-    display: block;
-    color: white;
-    text-decoration: none;
-    font-size: 25px;
-    font-weight: bold;
-    margin-bottom: 35px;
-}
-
-.admin-logo span {
-    color: var(--gold);
-}
-
-.sidebar-label {
-    color: #777;
-    font-size: 11px;
-    letter-spacing: 2px;
-    margin: 25px 10px 12px;
-}
-
-.sidebar button {
-    display: block;
-    width: 100%;
-    padding: 13px;
-    background: transparent;
-    border: none;
-    border-radius: 5px;
-    color: #bbb;
-    text-align: left;
-    cursor: pointer;
-    font-size: 14px;
-    margin-bottom: 5px;
-}
-
-.sidebar button:hover,
-.sidebar button.active {
-    background: #302719;
-    color: var(--gold);
-}
-
-.admin-main {
-    flex: 1;
-    min-width: 0;
-}
-
-.topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 30px;
-    background: #151515;
-    border-bottom: 1px solid var(--border);
-    gap: 15px;
-}
-
-.topbar h1 {
-    font-size: 22px;
-    color: var(--gold);
-}
-
-.topbar p {
-    color: var(--muted);
-    font-size: 12px;
-    margin-top: 5px;
-}
-
-.admin-badge {
-    padding: 9px 14px;
-    border: 1px solid #66532e;
-    color: var(--gold);
-    border-radius: 20px;
-    font-size: 12px;
-}
-
-.dashboard-content {
-    padding: 30px;
-}
-
-.notice {
-    background: #302719;
-    border: 1px solid #66532e;
-    color: #e8c47c;
-    padding: 15px;
-    border-radius: 7px;
-    line-height: 1.6;
-    margin-bottom: 25px;
-    font-size: 13px;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin-bottom: 30px;
-}
-
-.stat-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    padding: 23px;
-    border-radius: 8px;
-}
-
-.stat-card p {
-    color: var(--muted);
-    font-size: 13px;
-    margin-bottom: 15px;
-}
-
-.stat-card h2 {
-    color: var(--gold);
-    font-size: 29px;
-}
-
-.section-panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 23px;
-    margin-bottom: 25px;
-}
-
-.section-panel h2 {
-    color: var(--gold);
-    font-size: 19px;
-    margin-bottom: 20px;
-}
-
-.section-description {
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.6;
-    margin-top: -10px;
-    margin-bottom: 20px;
-}
-
-.admin-table-wrapper {
-    overflow-x: auto;
-}
-
-.admin-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 550px;
-}
-
-.admin-table th,
-.admin-table td {
-    padding: 15px 12px;
-    border-bottom: 1px solid var(--border);
-    text-align: left;
-    font-size: 13px;
-}
-
-.admin-table th {
-    color: var(--gold);
-}
-
-.admin-table td {
-    color: #ccc;
-}
-
-.status {
-    display: inline-block;
-    padding: 5px 9px;
-    background: #302719;
-    color: var(--gold);
-    border-radius: 20px;
-    font-size: 11px;
-}
-
-.action-btn {
-    display: inline-block;
-    padding: 10px 15px;
-    border: 1px solid var(--gold);
-    border-radius: 5px;
-    color: var(--gold);
-    background: transparent;
-    cursor: pointer;
-    text-decoration: none;
-    font-size: 12px;
-}
-
-.action-btn:hover {
-    background: var(--gold);
-    color: #111;
-}
-
-.empty-message {
-    color: var(--muted);
-    padding: 20px 0;
-    line-height: 1.6;
-}
-
-.admin-page {
-    display: none;
-}
-
-.admin-page.active {
-    display: block;
-}
-
-.quick-links {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-}
-
-.quick-link {
-    display: block;
-    padding: 20px;
-    background: #202020;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    color: white;
-    text-decoration: none;
-}
-
-.quick-link strong {
-    display: block;
-    color: var(--gold);
-    margin-bottom: 8px;
-}
-
-.quick-link span {
-    color: var(--muted);
-    font-size: 12px;
-}
-
-.mobile-menu {
-    display: none;
-    background: transparent;
-    color: var(--gold);
-    border: 1px solid var(--gold);
-    padding: 8px 12px;
-    border-radius: 5px;
-}
-
-@media(max-width: 1000px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media(max-width: 750px) {
-    .admin-layout {
-        display: block;
-    }
-
-    .sidebar {
-        display: none;
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .sidebar.open {
-        display: block;
-    }
-
-    .mobile-menu {
-        display: block;
-    }
-
-    .topbar {
-        padding: 17px;
-    }
-
-    .dashboard-content {
-        padding: 18px;
-    }
-
-    .quick-links {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media(max-width: 450px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .topbar h1 {
-        font-size: 18px;
-    }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.topbar{height:68px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:#090909;position:sticky;top:0;z-index:10}
+.brand{font-size:21px;font-weight:bold;letter-spacing:4px;color:var(--gold)}
+.brand small{display:block;font-size:9px;letter-spacing:3px;color:#aaa;margin-top:4px}
+.top-actions{display:flex;gap:10px;align-items:center}
+.layout{display:flex;min-height:calc(100vh - 68px)}
+.sidebar{width:225px;background:#0d0d0d;border-right:1px solid var(--border);padding:22px 12px;flex-shrink:0}
+.nav-title{font-size:10px;letter-spacing:2px;color:#777;padding:12px}
+.nav-btn{display:block;width:100%;text-align:left;background:transparent;color:#bbb;border:0;padding:13px 14px;border-radius:7px;margin:3px 0}
+.nav-btn:hover,.nav-btn.active{background:#211b10;color:var(--gold)}
+.main{padding:28px;width:100%;max-width:1500px;margin:auto}
+h1{font-size:27px;margin:0 0 8px}
+.subtitle{color:var(--muted);font-size:13px;margin-bottom:25px}
+.page{display:none}
+.page.active{display:block}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:24px}
+.stat,.panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:19px}
+.stat span{font-size:12px;color:var(--muted)}
+.stat strong{display:block;font-size:27px;color:var(--gold);margin-top:10px}
+.panel{margin-bottom:20px}
+.panel h3{margin:0 0 16px;font-size:16px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:15px}
+.toolbar-left{display:flex;gap:9px;flex-wrap:wrap}
+input,select,textarea{width:100%;background:#090909;border:1px solid #353535;color:white;padding:12px;border-radius:6px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+textarea{min-height:100px;resize:vertical}
+.field{margin-bottom:14px}
+.field label{display:block;color:#c7b98f;font-size:12px;margin-bottom:7px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{border:1px solid var(--gold);background:var(--gold);color:#080808;padding:10px 15px;border-radius:6px;font-weight:bold}
+.btn:hover{background:var(--gold2)}
+.btn.secondary{background:transparent;color:var(--gold)}
+.btn.danger{background:transparent;border-color:var(--red);color:var(--red)}
+.btn.small{padding:7px 10px;font-size:12px}
+table{width:100%;border-collapse:collapse;min-width:650px}
+th,td{padding:13px 11px;border-bottom:1px solid var(--border);text-align:left;font-size:13px;vertical-align:middle}
+th{color:var(--gold);font-size:11px;text-transform:uppercase;letter-spacing:1px}
+td{color:#ddd}
+.table-wrap{overflow-x:auto}
+.muted{color:var(--muted)}
+.status{display:inline-block;padding:5px 8px;border-radius:20px;background:#28251c;color:var(--gold);font-size:11px}
+.status.green{background:#14271d;color:var(--green)}
+.status.red{background:#301919;color:var(--red)}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.notice{padding:13px;border:1px solid #594820;background:#211b10;color:#e6cc8d;border-radius:7px;font-size:13px;margin-bottom:18px}
+#message{position:fixed;right:18px;bottom:18px;background:#1d1d1d;border:1px solid var(--gold);padding:14px 18px;border-radius:8px;display:none;z-index:50;max-width:90%}
+#modal{display:none;position:fixed;inset:0;background:#000c;z-index:30;overflow:auto;padding:25px}
+.modal-card{background:#111;border:1px solid var(--gold);border-radius:12px;max-width:760px;margin:20px auto;padding:24px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-head h2{margin:0;color:var(--gold);font-size:20px}
+.close{background:transparent;color:white;border:0;font-size:25px}
+.form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.empty{padding:25px;text-align:center;color:var(--muted)}
+.login-box{max-width:420px;margin:80px auto;background:var(--panel);padding:28px;border:1px solid var(--border);border-radius:12px}
+.login-box h2{color:var(--gold)}
+.hidden{display:none!important}
+@media(max-width:750px){
+ .layout{display:block}
+ .sidebar{width:100%;display:flex;overflow-x:auto;padding:8px;border-right:0;border-bottom:1px solid var(--border)}
+ .nav-title{display:none}
+ .nav-btn{white-space:nowrap;width:auto;padding:11px}
+ .main{padding:18px 12px}
+ .topbar{padding:0 13px}
+ .brand{font-size:17px}
+ .grid2{grid-template-columns:1fr}
 }
 </style>
 </head>
 
 <body>
-
-<div class="admin-layout">
-
-    <!-- SIDEBAR -->
-
-    <aside class="sidebar" id="sidebar">
-
-        <a href="index.html" class="admin-logo">
-            STAR<span>LUXE</span>
-        </a>
-
-        <p class="sidebar-label">MAIN MENU</p>
-
-        <button class="active" onclick="showPage('overview', this)">
-            ◈ Dashboard Overview
-        </button>
-
-        <button onclick="showPage('celebrities', this)">
-            ★ Celebrities
-        </button>
-
-        <button onclick="showPage('experiences', this)">
-            ✦ Experiences & Products
-        </button>
-
-        <p class="sidebar-label">MANAGEMENT</p>
-
-        <button onclick="showPage('orders', this)">
-            ▣ Orders
-        </button>
-
-        <button onclick="showPage('customers', this)">
-            ♙ Customers
-        </button>
-
-        <button onclick="showPage('payments', this)">
-            $ Payments
-        </button>
-
-        <p class="sidebar-label">PLATFORM</p>
-
-        <button onclick="showPage('reports', this)">
-            ▤ Reports
-        </button>
-
-        <button onclick="showPage('settings', this)">
-            ⚙ Settings
-        </button>
-
-        <p class="sidebar-label">WEBSITE</p>
-
-        <button onclick="location.href='index.html'">
-            ↗ View Website
-        </button>
-
-    </aside>
-
-
-    <!-- MAIN CONTENT -->
-
-    <main class="admin-main">
-
-        <header class="topbar">
-
-            <div style="display:flex;align-items:center;gap:14px;">
-
-                <button class="mobile-menu" onclick="toggleSidebar()">
-                    ☰
-                </button>
-
-                <div>
-                    <h1>Admin Dashboard</h1>
-                    <p>STARLUXE Marketplace Management</p>
-                </div>
-
-            </div>
-
-            <span class="admin-badge">
-                ADMIN PREVIEW
-            </span>
-
-        </header>
-
-
-        <div class="dashboard-content">
-
-            <div class="notice">
-                <strong>Development Preview:</strong>
-                This dashboard currently displays demonstration data.
-                It is not yet connected to the live database.
-                Secure administrator authentication and database permissions
-                must be configured before using it for real business operations.
-            </div>
-
-
-            <!-- OVERVIEW -->
-
-            <section class="admin-page active" id="overview">
-
-                <h2 style="color:#d6ad60;margin-bottom:22px;">
-                    Business Overview
-                </h2>
-
-                <div class="stats-grid">
-
-                    <div class="stat-card">
-                        <p>Total Celebrities</p>
-                        <h2 id="celebrity-count">0</h2>
-                    </div>
-
-                    <div class="stat-card">
-                        <p>Total Experiences</p>
-                        <h2 id="experience-count">0</h2>
-                    </div>
-
-                    <div class="stat-card">
-                        <p>Total Orders</p>
-                        <h2>—</h2>
-                    </div>
-
-                    <div class="stat-card">
-                        <p>Total Revenue</p>
-                        <h2>—</h2>
-                    </div>
-
-                </div>
-
-
-                <div class="section-panel">
-
-                    <h2>Welcome to STARLUXE</h2>
-
-                    <p class="section-description">
-                        Manage your worldwide celebrity marketplace
-                        from one central administration area.
-                    </p>
-
-                    <div class="quick-links">
-
-                        <a href="#" class="quick-link"
-                           onclick="showPage('celebrities');return false;">
-
-                            <strong>Celebrity Management</strong>
-
-                            <span>View celebrity directory records.</span>
-
-                        </a>
-
-                        <a href="#" class="quick-link"
-                           onclick="showPage('experiences');return false;">
-
-                            <strong>Experience Management</strong>
-
-                            <span>Review experience listings.</span>
-
-                        </a>
-
-                        <a href="#" class="quick-link"
-                           onclick="showPage('orders');return false;">
-
-                            <strong>Order Management</strong>
-
-                            <span>Prepare to manage customer orders.</span>
-
-                        </a>
-
-                    </div>
-
-                </div>
-
-
-                <div class="section-panel">
-
-                    <h2>Recent Activity</h2>
-
-                    <p class="empty-message">
-                        Activity tracking will appear here after the
-                        database and administration system are connected.
-                    </p>
-
-                </div>
-
-            </section>
-
-
-            <!-- CELEBRITIES -->
-
-            <section class="admin-page" id="celebrities">
-
-                <div class="section-panel">
-
-                    <h2>Celebrity Management</h2>
-
-                    <p class="section-description">
-                        Review celebrity profiles currently included
-                        in the demonstration data.
-                    </p>
-
-                    <div class="admin-table-wrapper">
-
-                        <table class="admin-table">
-
-                            <thead>
-                                <tr>
-                                    <th>Celebrity</th>
-                                    <th>Category</th>
-                                    <th>Status</th>
-                                    <th>Verification</th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="celebrity-table"></tbody>
-
-                        </table>
-
-                    </div>
-
-                    <p class="empty-message" id="celebrity-empty"></p>
-
-                </div>
-
-            </section>
-
-
-            <!-- EXPERIENCES -->
-
-            <section class="admin-page" id="experiences">
-
-                <div class="section-panel">
-
-                    <h2>Experiences & Products</h2>
-
-                    <p class="section-description">
-                        Review available demonstration experiences
-                        and their current publication status.
-                    </p>
-
-                    <div class="admin-table-wrapper">
-
-                        <table class="admin-table">
-
-                            <thead>
-                                <tr>
-                                    <th>Experience</th>
-                                    <th>Type</th>
-                                    <th>Price</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="experience-table"></tbody>
-
-                        </table>
-
-                    </div>
-
-                    <p class="empty-message" id="experience-empty"></p>
-
-                </div>
-
-            </section>
-
-
-            <!-- ORDERS -->
-
-            <section class="admin-page" id="orders">
-
-                <div class="section-panel">
-
-                    <h2>Customer Orders</h2>
-
-                    <p class="empty-message">
-                        No live order records are connected yet.
-                        Order management will become operational after
-                        the database and secure checkout are integrated.
-                    </p>
-
-                </div>
-
-            </section>
-
-
-            <!-- CUSTOMERS -->
-
-            <section class="admin-page" id="customers">
-
-                <div class="section-panel">
-
-                    <h2>Customer Management</h2>
-
-                    <p class="empty-message">
-                        Customer accounts and records will appear here
-                        after customer registration and database
-                        integration are completed.
-                    </p>
-
-                </div>
-
-            </section>
-
-
-            <!-- PAYMENTS -->
-
-            <section class="admin-page" id="payments">
-
-                <div class="section-panel">
-
-                    <h2>Payments & Transactions</h2>
-
-                    <p class="empty-message">
-                        Payment records, transaction references,
-                        refunds and payout management will be connected
-                        when the secure payment backend is implemented.
-                    </p>
-
-                </div>
-
-            </section>
-
-
-            <!-- REPORTS -->
-
-            <section class="admin-page" id="reports">
-
-                <div class="section-panel">
-
-                    <h2>Business Reports</h2>
-
-                    <p class="empty-message">
-                        Sales reports, platform commissions,
-                        celebrity performance and financial analytics
-                        will be available after real transactions
-                        are connected.
-                    </p>
-
-                </div>
-
-            </section>
-
-
-            <!-- SETTINGS -->
-
-            <section class="admin-page" id="settings">
-
-                <div class="section-panel">
-
-                    <h2>Platform Settings</h2>
-
-                    <div class="order-item">
-                        <span>Platform Name</span>
-                        <strong>STARLUXE</strong>
-                    </div>
-
-                    <div class="order-item">
-                        <span>Brand Tagline</span>
-                        <strong>Where Celebrity Meets Luxury</strong>
-                    </div>
-
-                    <div class="order-item">
-                        <span>Primary Currency</span>
-                        <strong>USD</strong>
-                    </div>
-
-                    <div class="order-item">
-                        <span>Payment Provider</span>
-                        <strong>Stripe — Integration Pending</strong>
-                    </div>
-
-                    <div class="order-item">
-                        <span>Database</span>
-                        <strong>Supabase — Integration Pending</strong>
-                    </div>
-
-                </div>
-
-            </section>
-
-        </div>
-
-    </main>
-
+<header class="topbar">
+  <div class="brand">STARLUXE<small>ADMINISTRATION</small></div>
+  <div class="top-actions">
+    <span id="adminEmail" class="muted" style="font-size:12px"></span>
+    <button class="btn secondary small" id="logoutBtn">Sign out</button>
+  </div>
+</header>
+
+<div id="loginRequired" class="login-box hidden">
+  <h2>Administrator access required</h2>
+  <p class="muted">Please sign in with your authorized STARLUXE administrator account.</p>
+  <a class="btn" href="login.html" style="display:inline-block;text-decoration:none">Go to sign in</a>
 </div>
 
+<div id="denied" class="login-box hidden">
+  <h2>Access denied</h2>
+  <p class="muted">This account does not have administrator permission.</p>
+  <button class="btn secondary" onclick="window.location.href='login.html'">Return to sign in</button>
+</div>
 
-<script src="data.js"></script>
+<div id="dashboard" class="layout hidden">
+  <aside class="sidebar">
+    <div class="nav-title">MAIN MENU</div>
+    <button class="nav-btn active" data-page="overview">Overview</button>
+    <button class="nav-btn" data-page="celebrities">Celebrities</button>
+    <button class="nav-btn" data-page="packages">Booking packages</button>
+    <button class="nav-btn" data-page="bookings">Bookings</button>
+    <button class="nav-btn" data-page="customers">Customers</button>
+    <button class="nav-btn" data-page="payments">Payments</button>
+  </aside>
+
+  <main class="main">
+    <section class="page active" id="page-overview">
+      <h1>Dashboard overview</h1>
+      <p class="subtitle">Your STARLUXE marketplace at a glance.</p>
+      <div class="stats">
+        <div class="stat"><span>Total celebrities</span><strong id="statCelebrities">—</strong></div>
+        <div class="stat"><span>Booking packages</span><strong id="statPackages">—</strong></div>
+        <div class="stat"><span>Total bookings</span><strong id="statBookings">—</strong></div>
+        <div class="stat"><span>Pending bookings</span><strong id="statPending">—</strong></div>
+        <div class="stat"><span>Payment records</span><strong id="statPayments">—</strong></div>
+      </div>
+      <div class="notice">Booking approval and payment verification are separate. This dashboard does not manually mark Stripe payments as paid.</div>
+      <div class="panel">
+        <h3>Recent bookings</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Reference</th><th>Customer</th><th>Celebrity</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody id="recentBookings"></tbody>
+        </table></div>
+      </div>
+      <button class="btn secondary" onclick="loadAll()">Refresh dashboard</button>
+    </section>
+
+    <section class="page" id="page-celebrities">
+      <h1>Celebrity management</h1>
+      <p class="subtitle">Create and manage celebrity profiles, photos, publishing and translations.</p>
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input id="celebritySearch" placeholder="Search celebrities..." style="max-width:260px">
+        </div>
+        <button class="btn" onclick="openCelebrity()">+ Add celebrity</button>
+      </div>
+      <div class="panel table-wrap">
+        <table>
+          <thead><tr><th>Celebrity</th><th>Country</th><th>Language</th><th>Verification</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="celebritiesTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-packages">
+      <h1>Booking packages</h1>
+      <p class="subtitle">Set up celebrity experiences, prices, deposits and durations.</p>
+      <div class="toolbar">
+        <select id="packageCelebrityFilter" style="max-width:260px"><option value="">All celebrities</option></select>
+        <button class="btn" onclick="openPackage()">+ Add package</button>
+      </div>
+      <div class="panel table-wrap">
+        <table>
+          <thead><tr><th>Package</th><th>Celebrity</th><th>Type</th><th>Price USD</th><th>Deposit</th><th>Active</th><th>Actions</th></tr></thead>
+          <tbody id="packagesTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-bookings">
+      <h1>Booking management</h1>
+      <p class="subtitle">Review customer requests and manage booking decisions.</p>
+      <div class="toolbar">
+        <select id="bookingFilter" style="max-width:220px">
+          <option value="">All statuses</option>
+          <option value="pending">Pending</option>
+          <option value="under_review">Under review</option>
+          <option value="approved">Approved</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="completed">Completed</option>
+          <option value="rejected">Rejected</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <button class="btn secondary" onclick="loadBookings()">Refresh</button>
+      </div>
+      <div class="panel table-wrap">
+        <table>
+          <thead><tr><th>Reference</th><th>Customer</th><th>Celebrity</th><th>Booking date</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="bookingsTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-customers">
+      <h1>Customers</h1>
+      <p class="subtitle">Customer details are compiled from booking records.</p>
+      <div class="panel table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Bookings</th><th>Last booking</th></tr></thead>
+          <tbody id="customersTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-payments">
+      <h1>Payment records</h1>
+      <p class="subtitle">View payment records saved by the payment workflow.</p>
+      <div class="notice">Payment records are displayed for monitoring. Successful payment status must come from verified server-side payment processing, not a manual dashboard edit.</div>
+      <div class="panel table-wrap">
+        <table>
+          <thead><tr><th>Booking</th><th>Amount</th><th>Currency</th><th>Type</th><th>Status</th><th>Paid at</th></tr></thead>
+          <tbody id="paymentsTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="modalTitle">Edit</h2>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div id="message"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 
 <script>
+(() => {
+"use strict";
 
-function showPage(pageId, button) {
+const db = window.STARLUXE_SUPABASE;
+const $ = id => document.getElementById(id);
 
-    document.querySelectorAll(".admin-page").forEach(function(page) {
-
-        page.classList.remove("active");
-
-    });
-
-    const selectedPage = document.getElementById(pageId);
-
-    if (selectedPage) {
-        selectedPage.classList.add("active");
-    }
-
-    document.querySelectorAll(".sidebar button").forEach(function(item) {
-
-        item.classList.remove("active");
-
-    });
-
-    if (button) {
-        button.classList.add("active");
-    }
-
-    document.getElementById("sidebar").classList.remove("open");
-
-}
-
-
-function toggleSidebar() {
-
-    document.getElementById("sidebar").classList.toggle("open");
-
-}
-
+let currentUser = null;
+let celebrities = [];
+let packages = [];
+let bookings = [];
+let payments = [];
 
 function escapeHTML(value) {
-
-    return String(value ?? "").replace(/[&<>"']/g, function(char) {
-
-        const entities = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;"
-        };
-
-        return entities[char];
-
-    });
-
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  })[char]);
 }
 
+function money(value) {
+  const amount = Number(value || 0);
+  return "$" + amount.toLocaleString("en-US", {minimumFractionDigits:2,maximumFractionDigits:2});
+}
 
-document.addEventListener("DOMContentLoaded", function() {
+function notify(message) {
+  $("message").textContent = message;
+  $("message").style.display = "block";
+  setTimeout(() => $("message").style.display = "none", 4000);
+}
 
-    const DATA = window.STARLUXE_DATA || window.STARLUXE;
+function showModal(title, html) {
+  $("modalTitle").textContent = title;
+  $("modalBody").innerHTML = html;
+  $("modal").style.display = "block";
+}
 
-    if (!DATA) {
-        return;
-    }
+function closeModal() {
+  $("modal").style.display = "none";
+  $("modalBody").innerHTML = "";
+}
 
+function field(label, name, value="", type="text", required=false) {
+  return `<div class="field"><label>${escapeHTML(label)}</label>
+  <input name="${escapeHTML(name)}" type="${escapeHTML(type)}" value="${escapeHTML(value)}" ${required?"required":""}></div>`;
+}
 
-    // Load celebrity records
+function area(label, name, value="") {
+  return `<div class="field"><label>${escapeHTML(label)}</label>
+  <textarea name="${escapeHTML(name)}">${escapeHTML(value)}</textarea></div>`;
+}
 
-    const celebrities = DATA.getCelebrities();
+function selectField(label, name, options, selected) {
+  return `<div class="field"><label>${escapeHTML(label)}</label><select name="${escapeHTML(name)}">
+  ${options.map(o => `<option value="${escapeHTML(o.value)}" ${o.value===selected?"selected":""}>${escapeHTML(o.label)}</option>`).join("")}
+  </select></div>`;
+}
 
-    document.getElementById("celebrity-count").textContent =
-        celebrities.length;
+async function init() {
+  if (!db) {
+    $("loginRequired").classList.remove("hidden");
+    $("loginRequired").querySelector("p").textContent =
+      "The Supabase client was not found. Check that supabase-config.js loads correctly.";
+    return;
+  }
 
-    const celebrityTable = document.getElementById("celebrity-table");
+  const {data, error} = await db.auth.getSession();
+  if (error || !data.session) {
+    $("loginRequired").classList.remove("hidden");
+    return;
+  }
 
-    if (celebrities.length) {
+  currentUser = data.session.user;
+  $("adminEmail").textContent = currentUser.email || "Administrator";
 
-        celebrityTable.innerHTML = celebrities.map(function(person) {
+  if (currentUser.app_metadata?.role !== "admin") {
+    $("denied").classList.remove("hidden");
+    return;
+  }
 
-            return `
-                <tr>
+  $("dashboard").classList.remove("hidden");
+  await loadAll();
+}
 
-                    <td>${escapeHTML(person.name || "Unnamed")}</td>
-
-                    <td>${escapeHTML(person.category || "Uncategorized")}</td>
-
-                    <td>
-                        <span class="status">
-                            ${escapeHTML(person.status || "Draft")}
-                        </span>
-                    </td>
-
-                    <td>
-                        ${person.verified ? "Verified" : "Not Verified"}
-                    </td>
-
-                </tr>
-            `;
-
-        }).join("");
-
-    } else {
-
-        document.getElementById("celebrity-empty").textContent =
-            "No celebrity records found.";
-
-    }
-
-
-    // Load experience records
-
-    const experiences = DATA.getOfferings();
-
-    document.getElementById("experience-count").textContent =
-        experiences.length;
-
-    const experienceTable = document.getElementById("experience-table");
-
-    if (experiences.length) {
-
-        experienceTable.innerHTML = experiences.map(function(item) {
-
-            const title = item.title || item.name || "Unnamed Experience";
-
-            const price = Number(item.price ?? item.selling_price ?? 0);
-
-            const currency = item.currency || "USD";
-
-            return `
-                <tr>
-
-                    <td>${escapeHTML(title)}</td>
-
-                    <td>${escapeHTML(item.type || "Uncategorized")}</td>
-
-                    <td>
-                        ${new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: currency
-                        }).format(price)}
-                    </td>
-
-                    <td>
-                        <span class="status">
-                            ${escapeHTML(item.availability || "Draft")}
-                        </span>
-                    </td>
-
-                </tr>
-            `;
-
-        }).join("");
-
-    } else {
-
-        document.getElementById("experience-empty").textContent =
-            "No experience records found.";
-
-    }
-
+$("logoutBtn").addEventListener("click", async () => {
+  if (!db) return;
+  await db.auth.signOut();
+  window.location.href = "login.html";
 });
 
-</script>
+document.querySelectorAll(".nav-btn").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    button.classList.add("active");
+    $("page-" + button.dataset.page).classList.add("active");
+  });
+});
 
+async function loadAll() {
+  await Promise.all([
+    loadCelebrities(),
+    loadPackages(),
+    loadBookings(),
+    loadPayments()
+  ]);
+  renderOverview();
+  renderCustomers();
+}
+
+async function loadCelebrities() {
+  const {data,error} = await db.from("celebrities")
+    .select("*").order("created_at",{ascending:false});
+  if(error) { notify("Could not load celebrities: " + error.message); return; }
+  celebrities = data || [];
+  renderCelebrities();
+  updateCelebritySelects();
+}
+
+function renderCelebrities() {
+  const search = ($("celebritySearch").value || "").toLowerCase();
+  const rows = celebrities.filter(c =>
+    (c.name || "").toLowerCase().includes(search) ||
+    (c.country || "").toLowerCase().includes(search)
+  );
+  $("celebritiesTable").innerHTML = rows.length ? rows.map(c => `
+    <tr>
+      <td><strong>${escapeHTML(c.name)}</strong><br><small class="muted">${escapeHTML(c.slug)}</small></td>
+      <td>${escapeHTML(c.country || "—")}</td>
+      <td>${escapeHTML(c.primary_language || "en")}</td>
+      <td><span class="status">${escapeHTML(c.verification_status || "unverified")}</span></td>
+      <td><span class="status ${c.status==="published"?"green":""}">${escapeHTML(c.status || "draft")}</span></td>
+      <td><div class="actions">
+        <button class="btn secondary small" onclick="editCelebrity('${c.id}')">Edit</button>
+        <button class="btn secondary small" onclick="editCelebrityTranslations('${c.id}')">Languages</button>
+      </div></td>
+    </tr>`).join("") : `<tr><td colspan="6" class="empty">No celebrity profiles found.</td></tr>`;
+}
+
+$("celebritySearch").addEventListener("input", renderCelebrities);
+
+function updateCelebritySelects() {
+  const options = celebrities.map(c => `<option value="${escapeHTML(c.id)}">${escapeHTML(c.name)}</option>`).join("");
+  $("packageCelebrityFilter").innerHTML = `<option value="">All celebrities</option>${options}`;
+}
+
+window.openCelebrity = function(c={}) {
+  showModal(c.id ? "Edit celebrity" : "Add celebrity", `
+    <form id="celebrityForm">
+      <div class="grid2">
+        ${field("Celebrity name","name",c.name||"","text",true)}
+        ${field("URL slug (unique)","slug",c.slug||"","text",true)}
+      </div>
+      <div class="grid2">
+        ${field("Profession","profession",c.profession||"")}
+        ${field("Country","country",c.country||"")}
+      </div>
+      ${area("Biography","biography",c.biography||"")}
+      <div class="grid2">
+        ${selectField("Primary language","primary_language",[
+          {value:"en",label:"English"},{value:"de-DE",label:"German"},
+          {value:"fr-FR",label:"French"},{value:"es-ES",label:"Spanish"},
+          {value:"it-IT",label:"Italian"},{value:"pt-PT",label:"Portuguese"},
+          {value:"pt-BR",label:"Brazilian Portuguese"}
+        ],c.primary_language||"en")}
+        ${selectField("Verification","verification_status",[
+          {value:"unverified",label:"Unverified"},
+          {value:"pending",label:"Pending"},
+          {value:"verified",label:"Verified"}
+        ],c.verification_status||"unverified")}
+      </div>
+      <div class="grid2">
+        ${selectField("Profile status","status",[
+          {value:"draft",label:"Draft"},{value:"published",label:"Published"},
+          {value:"archived",label:"Archived"}
+        ],c.status||"draft")}
+        <div class="field"><label>Supported languages</label>
+          <input name="supported_languages" value="${escapeHTML((c.supported_languages||["en"]).join(","))}" placeholder="de-DE,en">
+        </div>
+      </div>
+      <div class="field"><label>Profile image</label><input type="file" name="profile_file" accept="image/*"></div>
+      <div class="field"><label>Cover image</label><input type="file" name="cover_file" accept="image/*"></div>
+      ${field("Profile image URL","profile_image",c.profile_image||"")}
+      ${field("Cover image URL","cover_image",c.cover_image||"")}
+      <div class="field"><label><input style="width:auto" type="checkbox" name="featured" ${c.featured?"checked":""}> Featured celebrity</label></div>
+      <div class="form-actions">
+        <button class="btn" type="submit">Save celebrity</button>
+        <button class="btn secondary" type="button" onclick="closeModal()">Cancel</button>
+      </div>
+    </form>
+  `);
+
+  const form=$("celebrityForm");
+  if(c.id) form.dataset.id=c.id;
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const name = String(fd.get("name")||"").trim();
+    const slug = String(fd.get("slug")||"").trim().toLowerCase()
+      .replace(/[^a-z0-9-]/g,"-").replace(/-+/g,"-").replace(/^-|-$/g,"");
+    if (!name || !slug) return notify("Name and slug are required.");
+
+    const country = String(fd.get("country")||"").trim();
+    let language = String(fd.get("primary_language")||"en");
+    if (["germany","deutschland"].includes(country.toLowerCase())) language = "de-DE";
+
+    let supported = String(fd.get("supported_languages")||"en")
+      .split(",").map(x=>x.trim()).filter(Boolean);
+    if (!supported.includes(language)) supported.unshift(language);
+    if (!supported.includes("en")) supported.push("en");
+
+    const record = {
+      name, slug,
+      profession: String(fd.get("profession")||"").trim() || null,
+      country: country || null,
+      biography: String(fd.get("biography")||"").trim() || null,
+      primary_language: language,
+      supported_languages: [...new Set(supported)],
+      verification_status: fd.get("verification_status"),
+      status: fd.get("status"),
+      featured: fd.get("featured")==="on",
+      updated_at: new Date().toISOString()
+    };
+
+    try {
+      if (fd.get("profile_file")?.size) {
+        record.profile_image = await uploadImage(fd.get("profile_file"),"celebrities");
+      } else if (fd.get("profile_image")) {
+        record.profile_image = String(fd.get("profile_image")).trim();
+      }
+      if (fd.get("cover_file")?.size) {
+        record.cover_image = await uploadImage(fd.get("cover_file"),"celebrity-covers");
+      } else if (fd.get("cover_image")) {
+        record.cover_image = String(fd.get("cover_image")).trim();
+      }
+    } catch(err) { return notify(err.message); }
+
+    const editingId = form.dataset.id || null;
+    const result = editingId
+      ? await db.from("celebrities").update(record).eq("id",editingId)
+      : await db.from("celebrities").insert(record);
+
+    if(result.error) return notify("Save failed: "+result.error.message);
+    notify("Celebrity saved successfully.");
+    closeModal();
+    await loadCelebrities();
+  });
+};
+
+window.editCelebrity = function(id) {
+  const c = celebrities.find(x=>x.id===id);
+  if(c) openCelebrity(c);
+};
+
+async function uploadImage(file,folder) {
+  if(!file || !file.type.startsWith("image/")) throw new Error("Please select a valid image.");
+  if(file.size > 8*1024*1024) throw new Error("Image must be smaller than 8 MB.");
+  const safeName = file.name.toLowerCase().replace(/[^a-z0-9.-]/g,"-");
+  const path = folder + "/" + crypto.randomUUID() + "-" + safeName;
+  const {error} = await db.storage.from("starluxe-media")
+    .upload(path,file,{cacheControl:"3600",upsert:false});
+  if(error) throw error;
+  const {data} = db.storage.from("starluxe-media").getPublicUrl(path);
+  return data.publicUrl;
+}
+
+window.editCelebrityTranslations = async function(id) {
+  const c = celebrities.find(x=>x.id===id);
+  if(!c) return;
+  const {data,error} = await db.from("celebrity_translations")
+    .select("*").eq("celebrity_id",id);
+  if(error) return notify(error.message);
+  const translations = data || [];
+  const german = translations.find(t=>t.language_code==="de-DE") || {};
+  const english = translations.find(t=>t.language_code==="en") || {};
+
+  showModal("Celebrity translations — "+c.name, `
+    <p class="muted">Add translated profile content. The profile's primary language is ${escapeHTML(c.primary_language||"en")}.</p>
+    <form id="translationForm">
+      <h3>German (de-DE)</h3>
+      ${field("German name","de_name",german.name||"")}
+      ${field("German profession","de_profession",german.profession||"")}
+      ${area("German biography","de_biography",german.biography||"")}
+      ${field("German SEO title","de_seo_title",german.seo_title||"")}
+      ${area("German SEO description","de_seo_description",german.seo_description||"")}
+      <hr style="border-color:#333;margin:22px 0">
+      <h3>English (en)</h3>
+      ${field("English name","en_name",english.name||"")}
+      ${field("English profession","en_profession",english.profession||"")}
+      ${area("English biography","en_biography",english.biography||"")}
+      ${field("English SEO title","en_seo_title",english.seo_title||"")}
+      ${area("English SEO description","en_seo_description",english.seo_description||"")}
+      <div class="form-actions"><button class="btn" type="submit">Save translations</button></div>
+    </form>
+  `);
+
+  $("translationForm").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const fd=new FormData(e.currentTarget);
+    const records=[];
+    for(const lang of ["de","en"]){
+      const code=lang==="de"?"de-DE":"en";
+      const prefix=lang+"_";
+      const row={
+        celebrity_id:id,language_code:code,
+        name:String(fd.get(prefix+"name")||"").trim()||c.name,
+        profession:String(fd.get(prefix+"profession")||"").trim()||null,
+        biography:String(fd.get(prefix+"biography")||"").trim()||null,
+        seo_title:String(fd.get(prefix+"seo_title")||"").trim()||null,
+        seo_description:String(fd.get(prefix+"seo_description")||"").trim()||null,
+        updated_at:new Date().toISOString()
+      };
+      if(row.name!==c.name || row.profession || row.biography || row.seo_title || row.seo_description) records.push(row);
+    }
+    if(!records.length) return notify("Enter at least one translation first.");
+    const {error}=await db.from("celebrity_translations")
+      .upsert(records,{onConflict:"celebrity_id,language_code"});
+    if(error) return notify("Translation save failed: "+error.message);
+    notify("Translations saved.");
+    closeModal();
+  });
+};
+
+async function loadPackages() {
+  const {data,error}=await db.from("booking_packages")
+    .select("*").order("created_at",{ascending:false});
+  if(error){notify("Packages: "+error.message);return;}
+  packages=data||[];
+  renderPackages();
+}
+
+function renderPackages() {
+  const filter=$("packageCelebrityFilter").value;
+  const rows=packages.filter(p=>!filter||p.celebrity_id===filter);
+  $("packagesTable").innerHTML=rows.length?rows.map(p=>{
+    const c=celebrities.find(x=>x.id===p.celebrity_id);
+    return `<tr>
+      <td><strong>${escapeHTML(p.name)}</strong><br><small class="muted">${escapeHTML(p.description||"")}</small></td>
+      <td>${escapeHTML(c?.name||"Unknown")}</td>
+      <td>${escapeHTML(p.booking_type)}</td>
+      <td>${money(p.price_usd)}</td>
+      <td>${escapeHTML(p.deposit_percentage)}%</td>
+      <td>${p.is_active?'<span class="status green">Active</span>':'<span class="status red">Inactive</span>'}</td>
+      <td><div class="actions">
+        <button class="btn secondary small" onclick="editPackage('${p.id}')">Edit</button>
+        <button class="btn secondary small" onclick="editPackageTranslations('${p.id}')">Languages</button>
+      </div></td>
+    </tr>`;
+  }).join(""):`<tr><td colspan="7" class="empty">No packages found.</td></tr>`;
+}
+
+$("packageCelebrityFilter").addEventListener("change",renderPackages);
+
+window.openPackage=function(p={}) {
+  if(!celebrities.length) return notify("Add a celebrity profile first.");
+  const opts=celebrities.map(c=>({value:c.id,label:c.name}));
+  showModal(p.id?"Edit booking package":"Create booking package",`
+    <form id="packageForm">
+      ${selectField("Celebrity","celebrity_id",opts,p.celebrity_id||celebrities[0].id)}
+      ${field("Package name","name",p.name||"","text",true)}
+      ${area("Description","description",p.description||"")}
+      <div class="grid2">
+        ${selectField("Booking type","booking_type",[
+          {value:"meet_greet",label:"Meet and greet"},
+          {value:"private_event",label:"Private event"},
+          {value:"appearance",label:"Appearance"},
+          {value:"dinner",label:"Dinner"},
+          {value:"vacation",label:"Vacation"},
+          {value:"virtual_meeting",label:"Virtual meeting"},
+          {value:"other",label:"Other"}
+        ],p.booking_type||"meet_greet")}
+        ${field("Price (USD)","price_usd",p.price_usd??"","number",true)}
+      </div>
+      <div class="grid2">
+        ${field("Deposit percentage","deposit_percentage",p.deposit_percentage??30,"number",true)}
+        ${field("Duration (minutes)","duration_minutes",p.duration_minutes??60,"number")}
+      </div>
+      <div class="field"><label><input style="width:auto" type="checkbox" name="is_active" ${p.is_active!==false?"checked":""}> Active package</label></div>
+      <div class="form-actions"><button class="btn" type="submit">Save package</button></div>
+    </form>
+  `);
+  $("packageForm").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const fd=new FormData(e.currentTarget);
+    const record={
+      celebrity_id:fd.get("celebrity_id"),
+      name:String(fd.get("name")||"").trim(),
+      description:String(fd.get("description")||"").trim()||null,
+      booking_type:fd.get("booking_type"),
+      price_usd:Number(fd.get("price_usd")),
+      deposit_percentage:Number(fd.get("deposit_percentage")),
+      duration_minutes:fd.get("duration_minutes")?Number(fd.get("duration_minutes")):null,
+      is_active:fd.get("is_active")==="on",
+      updated_at:new Date().toISOString()
+    };
+    if(!record.name||!Number.isFinite(record.price_usd)||record.price_usd<0||
+      !Number.isFinite(record.deposit_percentage)||record.deposit_percentage<0||
+      record.deposit_percentage>100) return notify("Check the package name, price and deposit percentage.");
+    const result=p.id
+      ? await db.from("booking_packages").update(record).eq("id",p.id)
+      : await db.from("booking_packages").insert(record);
+    if(result.error) return notify("Package save failed: "+result.error.message);
+    notify("Package saved.");
+    closeModal(); await loadPackages();
+  });
+};
+
+window.editPackage=id=>{
+  const p=packages.find(x=>x.id===id);
+  if(p) openPackage(p);
+};
+
+window.editPackageTranslations=async id=>{
+  const p=packages.find(x=>x.id===id);
+  if(!p) return;
+  const {data,error}=await db.from("booking_package_translations")
+    .select("*").eq("package_id",id);
+  if(error) return notify(error.message);
+  const rows=data||[];
+  const de=rows.find(x=>x.language_code==="de-DE")||{};
+  const en=rows.find(x=>x.language_code==="en")||{};
+  showModal("Package translations",`
+    <form id="packageTranslationForm">
+      <h3>German (de-DE)</h3>
+      ${field("German package name","de_name",de.name||"")}
+      ${area("German description","de_description",de.description||"")}
+      <h3>English (en)</h3>
+      ${field("English package name","en_name",en.name||"")}
+      ${area("English description","en_description",en.description||"")}
+      <div class="form-actions"><button class="btn">Save translations</button></div>
+    </form>
+  `);
+  $("packageTranslationForm").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const fd=new FormData(e.currentTarget);
+    const records=[];
+    for(const lang of ["de","en"]){
+      const prefix=lang+"_";
+      const name=String(fd.get(prefix+"name")||"").trim();
+      const description=String(fd.get(prefix+"description")||"").trim();
+      if(name||description) records.push({
+        package_id:id,language_code:lang==="de"?"de-DE":"en",
+        name:name||p.name,description:description||null,
+        updated_at:new Date().toISOString()
+      });
+    }
+    if(!records.length) return notify("Enter at least one translation.");
+    const {error}=await db.from("booking_package_translations")
+      .upsert(records,{onConflict:"package_id,language_code"});
+    if(error) return notify(error.message);
+    notify("Package translations saved.");closeModal();
+  });
+};
+
+async function loadBookings() {
+  const {data,error}=await db.from("celebrity_bookings")
+    .select("*").order("created_at",{ascending:false});
+  if(error){notify("Bookings: "+error.message);return;}
+  bookings=data||[];
+  renderBookings();
+}
+
+function renderBookings() {
+  const filter=$("bookingFilter").value;
+  const rows=bookings.filter(b=>!filter||b.status===filter);
+  $("bookingsTable").innerHTML=rows.length?rows.map(b=>{
+    const c=celebrities.find(x=>x.id===b.celebrity_id);
+    return `<tr>
+      <td><strong>${escapeHTML(b.booking_reference)}</strong></td>
+      <td>${escapeHTML(b.customer_name)}<br><small class="muted">${escapeHTML(b.customer_email)}</small></td>
+      <td>${escapeHTML(c?.name||"—")}</td>
+      <td>${escapeHTML(b.event_date||"Not set")}</td>
+      <td>${money(b.quoted_amount_usd)}</td>
+      <td><span class="status">${escapeHTML(b.status)}</span></td>
+      <td><button class="btn secondary small" onclick="viewBooking('${b.id}')">Review</button></td>
+    </tr>`;
+  }).join(""):`<tr><td colspan="7" class="empty">No bookings found.</td></tr>`;
+}
+
+$("bookingFilter").addEventListener("change",renderBookings);
+
+window.viewBooking=function(id) {
+  const b=bookings.find(x=>x.id===id);
+  if(!b) return;
+  const c=celebrities.find(x=>x.id===b.celebrity_id);
+  showModal("Review booking "+b.booking_reference,`
+    <div class="panel">
+      <p><strong>Customer:</strong> ${escapeHTML(b.customer_name)}</p>
+      <p><strong>Email:</strong> ${escapeHTML(b.customer_email)}</p>
+      <p><strong>Phone:</strong> ${escapeHTML(b.customer_phone||"—")}</p>
+      <p><strong>Celebrity:</strong> ${escapeHTML(c?.name||"—")}</p>
+      <p><strong>Booking type:</strong> ${escapeHTML(b.booking_type)}</p>
+      <p><strong>Event date:</strong> ${escapeHTML(b.event_date||"Not specified")}</p>
+      <p><strong>Location:</strong> ${escapeHTML(b.event_location||"Not specified")}</p>
+      <p><strong>Budget:</strong> ${money(b.customer_budget_usd)}</p>
+      <p><strong>Quoted amount:</strong> ${money(b.quoted_amount_usd)}</p>
+      <p><strong>Payment status:</strong> ${escapeHTML(b.payment_status)}</p>
+      <p><strong>Customer message:</strong><br>${escapeHTML(b.customer_message||"None")}</p>
+    </div>
+    <form id="bookingReviewForm">
+      ${selectField("Booking status","status",[
+        {value:"pending",label:"Pending"},
+        {value:"under_review",label:"Under review"},
+        {value:"approved",label:"Approved"},
+        {value:"confirmed",label:"Confirmed"},
+        {value:"completed",label:"Completed"},
+        {value:"rejected",label:"Rejected"},
+        {value:"cancelled",label:"Cancelled"}
+      ],b.status)}
+      ${area("Admin response","admin_response",b.admin_response||"")}
+      <div class="form-actions"><button class="btn">Save booking decision</button></div>
+    </form>
+  `);
+  $("bookingReviewForm").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const fd=new FormData(e.currentTarget);
+    const {error}=await db.from("celebrity_bookings")
+      .update({status:fd.get("status"),admin_response:String(fd.get("admin_response")||"").trim()||null,updated_at:new Date().toISOString()})
+      .eq("id",id);
+    if(error) return notify("Booking update failed: "+error.message);
+    notify("Booking updated.");
+    closeModal();await loadBookings();
+  });
+};
+
+async function loadPayments() {
+  const {data,error}=await db.from("booking_payments")
+    .select("*").order("created_at",{ascending:false});
+  if(error){notify("Payments: "+error.message);return;}
+  payments=data||[];
+  $("paymentsTable").innerHTML=payments.length?payments.map(p=>`
+    <tr>
+      <td>${escapeHTML(bookings.find(b=>b.id===p.booking_id)?.booking_reference||p.booking_id)}</td>
+      <td>${money(p.amount_usd)}</td>
+      <td>${escapeHTML(p.currency||"USD")}</td>
+      <td>${escapeHTML(p.payment_type)}</td>
+      <td><span class="status">${escapeHTML(p.payment_status)}</span></td>
+      <td>${escapeHTML(p.paid_at||"—")}</td>
+    </tr>`).join(""):`<tr><td colspan="6" class="empty">No payment records found.</td></tr>`;
+}
+
+function renderCustomers() {
+  const customers=new Map();
+  bookings.forEach(b=>{
+    const key=(b.customer_email||"").toLowerCase();
+    if(!key)return;
+    if(!customers.has(key)) customers.set(key,{
+      name:b.customer_name,email:b.customer_email,phone:b.customer_phone,
+      count:0,last:b.created_at
+    });
+    const customer=customers.get(key);
+    customer.count++;
+    if(b.created_at>customer.last) customer.last=b.created_at;
+    if(!customer.phone&&b.customer_phone) customer.phone=b.customer_phone;
+  });
+  const rows=[...customers.values()];
+  $("customersTable").innerHTML=rows.length?rows.map(c=>`
+    <tr><td>${escapeHTML(c.name)}</td><td>${escapeHTML(c.email)}</td>
+    <td>${escapeHTML(c.phone||"—")}</td><td>${c.count}</td>
+    <td>${escapeHTML(c.last||"—")}</td></tr>`).join("")
+    :`<tr><td colspan="5" class="empty">No customer booking records yet.</td></tr>`;
+}
+
+function renderOverview() {
+  $("statCelebrities").textContent=celebrities.length;
+  $("statPackages").textContent=packages.length;
+  $("statBookings").textContent=bookings.length;
+  $("statPending").textContent=bookings.filter(b=>["pending","under_review"].includes(b.status)).length;
+  $("statPayments").textContent=payments.length;
+  $("recentBookings").innerHTML=bookings.slice(0,8).map(b=>{
+    const c=celebrities.find(x=>x.id===b.celebrity_id);
+    return `<tr>
+      <td>${escapeHTML(b.booking_reference)}</td>
+      <td>${escapeHTML(b.customer_name)}</td>
+      <td>${escapeHTML(c?.name||"—")}</td>
+      <td>${escapeHTML(b.status)}</td>
+      <td>${escapeHTML(b.created_at||"")}</td>
+    </tr>`;
+  }).join("")||`<tr><td colspan="5" class="empty">No bookings yet.</td></tr>`;
+}
+
+window.closeModal=closeModal;
+window.loadAll=loadAll;
+window.loadBookings=loadBookings;
+
+init();
+})();
+</script>
 </body>
 </html>
