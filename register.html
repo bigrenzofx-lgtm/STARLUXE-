@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account | STARLUXE</title>
+<link rel="stylesheet" href="styles.css">
+
+<style>
+.auth-section {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+}
+.auth-card {
+    width: 100%;
+    max-width: 470px;
+    background: #151515;
+    border: 1px solid rgba(214,173,96,.35);
+    padding: 35px;
+}
+.auth-card h1 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+.auth-card > p {
+    color: #aaa;
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 13px;
+}
+.auth-card label {
+    display: block;
+    color: #d6ad60;
+    font-size: 12px;
+    margin: 16px 0 7px;
+}
+.auth-card input {
+    width: 100%;
+    padding: 14px;
+    background: #090909;
+    color: white;
+    border: 1px solid #39342a;
+    outline: none;
+}
+.auth-card input:focus {
+    border-color: #d6ad60;
+}
+.auth-card button {
+    width: 100%;
+    margin-top: 24px;
+    border: none;
+}
+.auth-message {
+    margin-top: 18px;
+    font-size: 13px;
+    text-align: center;
+    color: #f0d397;
+    overflow-wrap: anywhere;
+}
+.auth-footer {
+    margin-top: 22px;
+    text-align: center;
+    color: #aaa;
+    font-size: 13px;
+}
+.auth-footer a {
+    color: #d6ad60;
+}
+</style>
+</head>
+
+<body>
+
+<section class="auth-section">
+<div class="auth-card">
+
+<a href="index.html" class="logo">
+STAR<span>LUXE</span>
+</a>
+
+<h1 style="margin-top:25px;">Create Your Account</h1>
+<p>Join STARLUXE and discover exclusive celebrity experiences.</p>
+
+<form id="registerForm">
+
+<label for="fullName">Full Name</label>
+<input
+    type="text"
+    id="fullName"
+    placeholder="Enter your full name"
+    required
+>
+
+<label for="email">Email Address</label>
+<input
+    type="email"
+    id="email"
+    placeholder="Enter your email"
+    required
+>
+
+<label for="phone">Phone Number</label>
+<input
+    type="tel"
+    id="phone"
+    placeholder="Enter your phone number"
+    required
+>
+
+<label for="password">Password</label>
+<input
+    type="password"
+    id="password"
+    placeholder="At least 8 characters"
+    minlength="8"
+    required
+>
+
+<label for="confirmPassword">Confirm Password</label>
+<input
+    type="password"
+    id="confirmPassword"
+    placeholder="Enter password again"
+    minlength="8"
+    required
+>
+
+<button type="submit" class="btn btn-gold" id="registerButton">
+CREATE ACCOUNT
+</button>
+
+<div class="auth-message" id="authMessage" role="status"></div>
+
+</form>
+
+<div class="auth-footer">
+Already have an account?
+<a href="login.html">Sign In</a>
+</div>
+
+</div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+
+<script>
+const registerForm = document.getElementById("registerForm");
+const authMessage = document.getElementById("authMessage");
+const registerButton = document.getElementById("registerButton");
+
+registerForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const fullName = document.getElementById("fullName").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+        authMessage.textContent = "Your passwords do not match.";
+        return;
+    }
+
+    if (password.length < 8) {
+        authMessage.textContent = "Password must contain at least 8 characters.";
+        return;
+    }
+
+    registerButton.disabled = true;
+    registerButton.textContent = "CREATING ACCOUNT...";
+    authMessage.textContent = "";
+
+    try {
+        const { data, error } =
+            await window.STARLUXE_SUPABASE.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: fullName,
+                        phone: phone
+                    },
+                    emailRedirectTo:
+                        window.location.origin +
+                        window.location.pathname.replace(
+                            /[^/]*$/,
+                            "index.html"
+                        )
+                }
+            });
+
+        if (error) throw error;
+
+        if (data.session) {
+            authMessage.textContent =
+                "Account created successfully! Redirecting...";
+
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 1800);
+        } else {
+            authMessage.textContent =
+                "Account created! Please check your email and confirm your address before signing in.";
+        }
+
+        registerForm.reset();
+
+    } catch (error) {
+        authMessage.textContent = error.message;
+    } finally {
+        registerButton.disabled = false;
+        registerButton.textContent = "CREATE ACCOUNT";
+    }
+});
+</script>
+
+</body>
+</html>
