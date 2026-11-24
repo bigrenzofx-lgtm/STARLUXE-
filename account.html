@@ -1,0 +1,451 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Account | STARLUXE</title>
+<link rel="stylesheet" href="styles.css">
+
+<style>
+.account-page {
+    max-width: 1100px;
+    margin: auto;
+    padding: 45px 20px 80px;
+}
+.account-heading {
+    margin-bottom: 30px;
+}
+.account-heading h1 {
+    font-size: 30px;
+    margin-bottom: 8px;
+}
+.account-heading p {
+    color: #aaa;
+}
+.account-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 25px;
+}
+.account-card {
+    background: #151515;
+    border: 1px solid rgba(214,173,96,.25);
+    padding: 25px;
+    margin-bottom: 20px;
+}
+.account-card h2 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: #d6ad60;
+}
+.profile-avatar {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #292035;
+    color: #d6ad60;
+    font-size: 27px;
+    margin-bottom: 15px;
+}
+.profile-name {
+    font-size: 19px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.profile-email {
+    color: #aaa;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+.account-card label {
+    display: block;
+    color: #d6ad60;
+    font-size: 12px;
+    margin: 15px 0 7px;
+}
+.account-card input {
+    width: 100%;
+    padding: 13px;
+    color: white;
+    background: #090909;
+    border: 1px solid #39342a;
+    outline: none;
+}
+.account-card input:focus {
+    border-color: #d6ad60;
+}
+.account-card button {
+    margin-top: 18px;
+}
+.account-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.account-actions a {
+    text-decoration: none;
+}
+.account-link {
+    display: block;
+    padding: 13px 0;
+    color: #ddd;
+    border-bottom: 1px solid #302b25;
+    text-decoration: none;
+}
+.account-link:hover {
+    color: #d6ad60;
+}
+.status-message {
+    margin-top: 15px;
+    color: #d6ad60;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+.empty-state {
+    text-align: center;
+    padding: 25px 10px;
+    color: #aaa;
+}
+.booking-item {
+    border-bottom: 1px solid #302b25;
+    padding: 15px 0;
+}
+.booking-item:last-child {
+    border-bottom: none;
+}
+.booking-item strong {
+    color: #fff;
+}
+.booking-status {
+    color: #d6ad60;
+    font-size: 12px;
+    margin-top: 7px;
+    text-transform: capitalize;
+}
+@media(max-width:700px) {
+    .account-grid {
+        grid-template-columns: 1fr;
+    }
+    .account-heading h1 {
+        font-size: 25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="site-header">
+    <a href="index.html" class="logo">STAR<span>LUXE</span></a>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="celebrities.html">Celebrities</a>
+        <a href="experiences.html">Experiences</a>
+    </nav>
+</header>
+
+<main class="account-page">
+
+<div class="account-heading">
+    <h1>My Account</h1>
+    <p>Manage your STARLUXE profile and exclusive experiences.</p>
+</div>
+
+<div class="account-grid">
+
+    <aside>
+
+        <div class="account-card">
+            <div class="profile-avatar" id="avatar">S</div>
+            <div class="profile-name" id="sidebarName">Loading...</div>
+            <div class="profile-email" id="sidebarEmail"></div>
+        </div>
+
+        <div class="account-card">
+            <h2>My Menu</h2>
+            <a class="account-link" href="#profile">My Profile</a>
+            <a class="account-link" href="#bookings">My Bookings</a>
+            <a class="account-link" href="#payments">My Payments</a>
+            <a class="account-link" href="#favorites">My Favorites</a>
+
+            <button class="btn btn-gold" id="logoutButton">
+                SIGN OUT
+            </button>
+        </div>
+
+    </aside>
+
+    <section>
+
+        <div class="account-card" id="profile">
+            <h2>Personal Information</h2>
+
+            <form id="profileForm">
+
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" required>
+
+                <label for="email">Email Address</label>
+                <input type="email" id="email" disabled>
+
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone">
+
+                <button type="submit" class="btn btn-gold" id="saveButton">
+                    SAVE CHANGES
+                </button>
+
+                <div class="status-message" id="profileMessage"></div>
+
+            </form>
+        </div>
+
+        <div class="account-card" id="bookings">
+            <h2>My Bookings</h2>
+            <div id="bookingsList" class="empty-state">
+                Loading bookings...
+            </div>
+        </div>
+
+        <div class="account-card" id="payments">
+            <h2>My Payments</h2>
+            <div id="paymentsList" class="empty-state">
+                Loading payments...
+            </div>
+        </div>
+
+        <div class="account-card" id="favorites">
+            <h2>My Favorites</h2>
+            <div id="favoritesList" class="empty-state">
+                Loading favorites...
+            </div>
+        </div>
+
+    </section>
+
+</div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+
+<script>
+const supabase = window.STARLUXE_SUPABASE;
+
+if (!supabase) {
+    document.body.innerHTML =
+        "<h2 style='padding:30px;color:white'>Supabase configuration could not be loaded.</h2>";
+    throw new Error("Supabase client missing.");
+}
+
+const profileMessage = document.getElementById("profileMessage");
+
+function showMessage(message) {
+    profileMessage.textContent = message;
+}
+
+function safeText(value) {
+    const span = document.createElement("span");
+    span.textContent = value || "";
+    return span.innerHTML;
+}
+
+async function loadAccount() {
+
+    const { data, error } = await supabase.auth.getUser();
+
+    if (error || !data.user) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    const user = data.user;
+    const metadata = user.user_metadata || {};
+
+    const fullName = metadata.full_name || "";
+    const phone = metadata.phone || "";
+
+    document.getElementById("sidebarName").textContent =
+        fullName || "STARLUXE Customer";
+
+    document.getElementById("sidebarEmail").textContent =
+        user.email || "";
+
+    document.getElementById("avatar").textContent =
+        (fullName || user.email || "S").charAt(0).toUpperCase();
+
+    document.getElementById("fullName").value = fullName;
+    document.getElementById("email").value = user.email || "";
+    document.getElementById("phone").value = phone;
+
+    await Promise.all([
+        loadBookings(user.id),
+        loadPayments(user.id),
+        loadFavorites(user.id)
+    ]);
+}
+
+async function loadBookings(userId) {
+
+    const container = document.getElementById("bookingsList");
+
+    const { data, error } = await supabase
+        .from("celebrity_bookings")
+        .select("id,reference_number,booking_status,status,created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        container.textContent = "Unable to load bookings: " + error.message;
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        container.textContent = "You have no bookings yet.";
+        return;
+    }
+
+    container.className = "";
+
+    container.innerHTML = data.map(booking => {
+        const status = booking.booking_status || booking.status || "pending";
+
+        return `
+            <div class="booking-item">
+                <strong>Booking ${safeText(booking.reference_number || booking.id)}</strong>
+                <div class="booking-status">${safeText(status)}</div>
+            </div>
+        `;
+    }).join("");
+}
+
+async function loadPayments(userId) {
+
+    const container = document.getElementById("paymentsList");
+
+    const { data, error } = await supabase
+        .from("booking_payments")
+        .select("id,amount,currency,payment_status,payment_type,created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        container.textContent = "Unable to load payments: " + error.message;
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        container.textContent = "No payment records yet.";
+        return;
+    }
+
+    container.className = "";
+
+    container.innerHTML = data.map(payment => `
+        <div class="booking-item">
+            <strong>${safeText(payment.currency || "USD")} ${Number(payment.amount).toFixed(2)}</strong>
+            <div class="booking-status">
+                ${safeText(payment.payment_type || "Payment")} —
+                ${safeText(payment.payment_status || "pending")}
+            </div>
+        </div>
+    `).join("");
+}
+
+async function loadFavorites(userId) {
+
+    const container = document.getElementById("favoritesList");
+
+    const { data, error } = await supabase
+        .from("celebrity_favorites")
+        .select("id,celebrity_id")
+        .eq("user_id", userId);
+
+    if (error) {
+        container.textContent = "Unable to load favorites: " + error.message;
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        container.textContent = "You have no favorite celebrities yet.";
+        return;
+    }
+
+    container.className = "";
+
+    container.innerHTML = data.map(favorite => `
+        <div class="booking-item">
+            Celebrity ID: ${safeText(favorite.celebrity_id)}
+        </div>
+    `).join("");
+}
+
+document.getElementById("profileForm")
+.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const fullName = document.getElementById("fullName").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+
+    const saveButton = document.getElementById("saveButton");
+
+    if (!fullName) {
+        showMessage("Please enter your full name.");
+        return;
+    }
+
+    saveButton.disabled = true;
+    saveButton.textContent = "SAVING...";
+
+    try {
+
+        const { error } = await supabase.auth.updateUser({
+            data: {
+                full_name: fullName,
+                phone: phone
+            }
+        });
+
+        if (error) throw error;
+
+        document.getElementById("sidebarName").textContent = fullName;
+        document.getElementById("avatar").textContent =
+            fullName.charAt(0).toUpperCase();
+
+        showMessage("Your profile has been updated successfully.");
+
+    } catch(error) {
+
+        showMessage(error.message);
+
+    } finally {
+
+        saveButton.disabled = false;
+        saveButton.textContent = "SAVE CHANGES";
+
+    }
+});
+
+document.getElementById("logoutButton")
+.addEventListener("click", async function() {
+
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+        alert(error.message);
+        return;
+    }
+
+    window.location.href = "login.html";
+});
+
+loadAccount();
+</script>
+
+</body>
+</html>
