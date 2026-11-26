@@ -39,9 +39,16 @@ button:hover,.btn:hover{background:#f0d36d}
 .details{font-size:13px;color:#aaa;line-height:2;margin-bottom:15px}
 .notice{padding:30px;text-align:center;color:#aaa;background:#151515;border-radius:10px;line-height:1.7}
 footer{text-align:center;border-top:1px solid #292929;padding:25px;color:#888;font-size:13px}
-@media(max-width:600px){.cover{height:200px}.profile{padding:0 10px;gap:12px;margin-top:-55px}.avatar{width:110px;height:110px}.identity{padding-top:55px}.identity h1{font-size:26px}}
+@media(max-width:600px){
+.cover{height:200px}
+.profile{padding:0 10px;gap:12px;margin-top:-55px}
+.avatar{width:110px;height:110px}
+.identity{padding-top:55px}
+.identity h1{font-size:26px}
+}
 </style>
 </head>
+
 <body>
 
 <header>
@@ -50,7 +57,7 @@ footer{text-align:center;border-top:1px solid #292929;padding:25px;color:#888;fo
 <a href="index.html">Home</a>
 <a href="celebrities.html">Celebrities</a>
 <a href="experiences.html">Experiences</a>
-<a href="account.html">My Account</a>
+<a href="account.html">Account</a>
 </nav>
 </header>
 
@@ -63,6 +70,7 @@ footer{text-align:center;border-top:1px solid #292929;padding:25px;color:#888;fo
 <script>
 const db=window.STARLUXE_SUPABASE;
 const main=document.getElementById("main");
+
 document.getElementById("year").textContent=new Date().getFullYear();
 
 const params=new URLSearchParams(location.search);
@@ -75,155 +83,291 @@ let packageTranslations=[];
 let selectedLanguage="auto";
 
 const words={
-en:{experiences:"Available Experiences",book:"Request Booking",deposit:"Deposit",duration:"Duration",minutes:"minutes",empty:"No active experiences are available at the moment.",back:"Back to celebrities",error:"Unable to load this celebrity profile.",country:"Country"},
-de:{experiences:"Verfügbare Erlebnisse",book:"Buchung anfragen",deposit:"Anzahlung",duration:"Dauer",minutes:"Minuten",empty:"Derzeit sind keine aktiven Erlebnisse verfügbar.",back:"Zurück zu den Prominenten",error:"Dieses Prominentenprofil konnte nicht geladen werden.",country:"Land"}
+en:{
+experiences:"Available Experiences",
+book:"Request Booking",
+deposit:"Deposit",
+duration:"Duration",
+minutes:"minutes",
+empty:"No active experiences are available at the moment.",
+back:"Back to celebrities",
+error:"Unable to load this celebrity profile.",
+country:"Country"
+},
+de:{
+experiences:"Verfügbare Erlebnisse",
+book:"Buchung anfragen",
+deposit:"Anzahlung",
+duration:"Dauer",
+minutes:"Minuten",
+empty:"Derzeit sind keine aktiven Erlebnisse verfügbar.",
+back:"Zurück zu den Prominenten",
+error:"Dieses Prominentenprofil konnte nicht geladen werden.",
+country:"Land"
+}
 };
 
 function language(){
- if(selectedLanguage!=="auto")return selectedLanguage;
- return celebrity?.primary_language||"en";
+if(selectedLanguage!=="auto")return selectedLanguage;
+return celebrity?.primary_language||"en";
 }
+
 function locale(){
- return language()==="de-DE"?"de":"en";
+return language().toLowerCase().startsWith("de")?"de":"en";
 }
+
 function getCelebrityText(){
- const code=language();
- return translations.find(x=>x.language_code===code)||{};
+const code=language();
+return translations.find(x=>x.language_code===code)||{};
 }
+
 function getPackageText(pkg){
- return packageTranslations.find(x=>
- x.package_id===pkg.id && x.language_code===language()
- )||{};
+return packageTranslations.find(x=>
+x.package_id===pkg.id && x.language_code===language()
+)||{};
 }
+
 function escapeHtml(value){
- return String(value??"").replace(/[&<>"']/g,c=>({
- "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
- })[c]);
+return String(value??"").replace(/[&<>"']/g,c=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#39;"
+})[c]);
 }
+
 function money(value){
- return new Intl.NumberFormat(locale()==="de"?"de-DE":"en-US",{
- style:"currency",currency:"USD",maximumFractionDigits:2
- }).format(Number(value||0));
+return new Intl.NumberFormat(
+locale()==="de"?"de-DE":"en-US",
+{
+style:"currency",
+currency:"USD",
+maximumFractionDigits:2
 }
+).format(Number(value||0));
+}
+
 function render(){
- const c=getCelebrityText();
- const w=words[locale()];
- const name=c.name||celebrity.name;
- const profession=c.profession||celebrity.profession||"";
- const biography=c.biography||celebrity.biography||"";
- const cover=celebrity.cover_image||"https://placehold.co/1200x400/171717/d4af37?text=STARLUXE";
- const photo=celebrity.profile_image||"https://placehold.co/400x400/171717/d4af37?text=STAR";
 
- main.innerHTML=`
- <img class="cover" src="${escapeHtml(cover)}" alt="Cover image" onerror="this.style.display='none'">
- <section class="profile">
- <img class="avatar" src="${escapeHtml(photo)}" alt="${escapeHtml(name)}" onerror="this.src='https://placehold.co/400x400/171717/d4af37?text=STAR'">
- <div class="identity">
- <h1>${escapeHtml(name)}</h1>
- <div class="gold">${escapeHtml(profession)}</div>
- <div class="muted">${escapeHtml(celebrity.country||"")}</div>
- </div>
- </section>
+const c=getCelebrityText();
+const w=words[locale()];
 
- <div style="display:flex;justify-content:flex-end;margin-top:25px">
- <select class="language" id="languagePicker" aria-label="Choose language">
- <option value="auto">Celebrity's language</option>
- <option value="de-DE">Deutsch</option>
- <option value="en">English</option>
- </select>
- </div>
+const name=c.name||celebrity.name;
+const profession=c.profession||celebrity.profession||"";
+const biography=c.biography||celebrity.biography||"";
 
- <p class="bio">${escapeHtml(biography)}</p>
- <h2 class="section-title">${w.experiences}</h2>
- <section class="packages" id="packages"></section>
- <p style="margin-top:35px"><a class="btn" href="celebrities.html">${w.back}</a></p>
- `;
+const cover=celebrity.cover_image||
+"https://placehold.co/1200x400/171717/d4af37?text=STARLUXE";
 
- const picker=document.getElementById("languagePicker");
- picker.value=selectedLanguage;
- picker.addEventListener("change",e=>{
- selectedLanguage=e.target.value;
- render();
- });
+const photo=celebrity.profile_image||
+"https://placehold.co/400x400/171717/d4af37?text=STAR";
 
- const packageGrid=document.getElementById("packages");
+main.innerHTML=`
 
- if(!packages.length){
- packageGrid.innerHTML=`<div class="notice">${w.empty}</div>`;
- return;
- }
+<img class="cover"
+src="${escapeHtml(cover)}"
+alt="Cover image"
+onerror="this.style.display='none'">
 
- packages.forEach(pkg=>{
- const translation=getPackageText(pkg);
- const title=translation.name||pkg.name;
- const description=translation.description||pkg.description||"";
- const deposit=Number(pkg.price_usd||0)*Number(pkg.deposit_percentage||0)/100;
+<section class="profile">
 
- const card=document.createElement("article");
- card.className="package";
- card.innerHTML=`
- <h3>${escapeHtml(title)}</h3>
- <div class="gold">${escapeHtml(pkg.booking_type||"")}</div>
- <div class="price">${money(pkg.price_usd)}</div>
- <p>${escapeHtml(description)}</p>
- <div class="details">
- ${w.deposit}: ${money(deposit)} (${Number(pkg.deposit_percentage||0)}%)<br>
- ${w.duration}: ${Number(pkg.duration_minutes||0)} ${w.minutes}
- </div>
- <a class="btn" href="login.html">${w.book}</a>
- `;
- packageGrid.appendChild(card);
- });
+<img class="avatar"
+src="${escapeHtml(photo)}"
+alt="${escapeHtml(name)}"
+onerror="this.src='https://placehold.co/400x400/171717/d4af37?text=STAR'">
+
+<div class="identity">
+<h1>${escapeHtml(name)}</h1>
+<div class="gold">${escapeHtml(profession)}</div>
+<div class="muted">${escapeHtml(celebrity.country||"")}</div>
+</div>
+
+</section>
+
+<div style="display:flex;justify-content:flex-end;margin-top:25px">
+
+<select class="language" id="languagePicker" aria-label="Choose language">
+
+<option value="auto">Celebrity's language</option>
+<option value="de-DE">Deutsch</option>
+<option value="en">English</option>
+
+</select>
+</div>
+
+<p class="bio">${escapeHtml(biography)}</p>
+
+<h2 class="section-title">${w.experiences}</h2>
+
+<section class="packages" id="packages"></section>
+
+<p style="margin-top:35px">
+<a class="btn" href="celebrities.html">${w.back}</a>
+</p>
+`;
+
+const picker=document.getElementById("languagePicker");
+
+picker.value=selectedLanguage;
+
+picker.addEventListener("change",e=>{
+selectedLanguage=e.target.value;
+render();
+});
+
+const packageGrid=document.getElementById("packages");
+
+if(!packages.length){
+packageGrid.innerHTML=
+`<div class="notice">${w.empty}</div>`;
+return;
+}
+
+packages.forEach(pkg=>{
+
+const translation=getPackageText(pkg);
+
+const title=translation.name||pkg.name;
+const description=translation.description||pkg.description||"";
+
+const deposit=
+Number(pkg.price_usd||0)*
+Number(pkg.deposit_percentage||0)/100;
+
+const card=document.createElement("article");
+
+card.className="package";
+
+const checkoutUrl=
+"checkout.html?package_id="+
+encodeURIComponent(pkg.id)+
+"&slug="+
+encodeURIComponent(celebrity.slug);
+
+card.innerHTML=`
+
+<h3>${escapeHtml(title)}</h3>
+
+<div class="gold">
+${escapeHtml(pkg.booking_type||"")}
+</div>
+
+<div class="price">
+${money(pkg.price_usd)}
+</div>
+
+<p>${escapeHtml(description)}</p>
+
+<div class="details">
+
+${w.deposit}: ${money(deposit)}
+(${Number(pkg.deposit_percentage||0)}%)<br>
+
+${w.duration}: 
+${Number(pkg.duration_minutes||0)}
+${w.minutes}
+
+</div>
+
+<a class="btn" href="${checkoutUrl}">
+${w.book}
+</a>
+
+`;
+
+packageGrid.appendChild(card);
+
+});
+
 }
 
 async function load(){
- if(!db){
- main.innerHTML='<div class="notice">Supabase configuration could not be loaded.</div>';
- return;
- }
- if(!slug){
- main.innerHTML='<div class="notice">Celebrity profile not specified.</div>';
- return;
- }
 
- try{
- const {data:c,error:ce}=await db.from("celebrities")
- .select("*").eq("slug",slug).eq("status","published").maybeSingle();
+if(!db){
+main.innerHTML=
+'<div class="notice">Supabase configuration could not be loaded.</div>';
+return;
+}
 
- if(ce)throw ce;
- if(!c){
- main.innerHTML='<div class="notice">This celebrity profile is not currently available.</div>';
- return;
- }
- celebrity=c;
+if(!slug){
+main.innerHTML=
+'<div class="notice">Celebrity profile not specified.</div>';
+return;
+}
 
- const {data:t,error:te}=await db.from("celebrity_translations")
- .select("*").eq("celebrity_id",celebrity.id);
- if(te)throw te;
- translations=t||[];
+try{
 
- const {data:p,error:pe}=await db.from("booking_packages")
- .select("*").eq("celebrity_id",celebrity.id).eq("is_active",true);
- if(pe)throw pe;
- packages=p||[];
+const {data:c,error:ce}=await db
+.from("celebrities")
+.select("*")
+.eq("slug",slug)
+.eq("status","published")
+.maybeSingle();
 
- if(packages.length){
- const ids=packages.map(x=>x.id);
- const {data:pt,error:pte}=await db.from("booking_package_translations")
- .select("*").in("package_id",ids);
- if(pte)throw pte;
- packageTranslations=pt||[];
- }
- render();
- }catch(error){
- console.error("STARLUXE profile error:",error);
- main.innerHTML='<div class="notice">'+
- escapeHtml(words.en.error)+'<br><br>'+
- escapeHtml(error.message||error)+'</div>';
- }
+if(ce)throw ce;
+
+if(!c){
+main.innerHTML=
+'<div class="notice">This celebrity profile is not currently available.</div>';
+return;
+}
+
+celebrity=c;
+
+const {data:t,error:te}=await db
+.from("celebrity_translations")
+.select("*")
+.eq("celebrity_id",celebrity.id);
+
+if(te)throw te;
+
+translations=t||[];
+
+const {data:p,error:pe}=await db
+.from("booking_packages")
+.select("*")
+.eq("celebrity_id",celebrity.id)
+.eq("is_active",true);
+
+if(pe)throw pe;
+
+packages=p||[];
+
+if(packages.length){
+
+const ids=packages.map(x=>x.id);
+
+const {data:pt,error:pte}=await db
+.from("booking_package_translations")
+.select("*")
+.in("package_id",ids);
+
+if(pte)throw pte;
+
+packageTranslations=pt||[];
+
+}
+
+render();
+
+}catch(error){
+
+console.error("STARLUXE profile error:",error);
+
+main.innerHTML=
+'<div class="notice">'+
+escapeHtml(words.en.error)+
+'<br><br>'+
+escapeHtml(error.message||error)+
+'</div>';
+
+}
+
 }
 
 load();
 </script>
+
 </body>
 </html>
