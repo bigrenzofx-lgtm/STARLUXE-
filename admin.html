@@ -50,7 +50,7 @@ textarea{min-height:100px;resize:vertical}
 .btn.secondary{background:transparent;color:var(--gold)}
 .btn.danger{background:transparent;border-color:var(--red);color:var(--red)}
 .btn.small{padding:7px 10px;font-size:12px}
-table{width:100%;border-collapse:collapse;min-width:650px}
+table{width:100%;border-collapse:collapse;min-width:750px}
 th,td{padding:13px 11px;border-bottom:1px solid var(--border);text-align:left;font-size:13px;vertical-align:middle}
 th{color:var(--gold);font-size:11px;text-transform:uppercase;letter-spacing:1px}
 td{color:#ddd}
@@ -72,6 +72,9 @@ td{color:#ddd}
 .login-box{max-width:420px;margin:80px auto;background:var(--panel);padding:28px;border:1px solid var(--border);border-radius:12px}
 .login-box h2{color:var(--gold)}
 .hidden{display:none!important}
+.proof-link{color:var(--gold2);text-decoration:underline}
+.detail-line{padding:9px 0;border-bottom:1px solid #292929;font-size:13px;overflow-wrap:anywhere}
+.detail-line strong{color:#c7b98f}
 @media(max-width:750px){
  .layout{display:block}
  .sidebar{width:100%;display:flex;overflow-x:auto;padding:8px;border-right:0;border-bottom:1px solid var(--border)}
@@ -127,8 +130,9 @@ td{color:#ddd}
         <div class="stat"><span>Total bookings</span><strong id="statBookings">—</strong></div>
         <div class="stat"><span>Pending bookings</span><strong id="statPending">—</strong></div>
         <div class="stat"><span>Payment records</span><strong id="statPayments">—</strong></div>
+        <div class="stat"><span>Pending payments</span><strong id="statPendingPayments">—</strong></div>
       </div>
-      <div class="notice">Booking approval and payment verification are separate. This dashboard does not manually mark Stripe payments as paid.</div>
+      <div class="notice">Payment verification and booking approval are separate. Verifying a payment does not automatically confirm a booking.</div>
       <div class="panel">
         <h3>Recent bookings</h3>
         <div class="table-wrap"><table>
@@ -207,12 +211,34 @@ td{color:#ddd}
     </section>
 
     <section class="page" id="page-payments">
-      <h1>Payment records</h1>
-      <p class="subtitle">View payment records saved by the payment workflow.</p>
-      <div class="notice">Payment records are displayed for monitoring. Successful payment status must come from verified server-side payment processing, not a manual dashboard edit.</div>
+      <h1>Payment management</h1>
+      <p class="subtitle">Review customer transfers, cryptocurrency payments and uploaded evidence.</p>
+      <div class="notice">
+        Customer submissions remain pending until you verify them. USDT uses TRC20. USDC submissions are not enabled yet. Never approve a payment based only on a screenshot; check your receiving account or wallet.
+      </div>
+      <div class="toolbar">
+        <select id="paymentFilter" style="max-width:220px">
+          <option value="">All payment statuses</option>
+          <option value="pending">Pending</option>
+          <option value="paid">Paid / verified</option>
+          <option value="failed">Rejected / failed</option>
+          <option value="refunded">Refunded</option>
+        </select>
+        <button class="btn secondary" onclick="loadPayments()">Refresh payments</button>
+      </div>
       <div class="panel table-wrap">
         <table>
-          <thead><tr><th>Booking</th><th>Amount</th><th>Currency</th><th>Type</th><th>Status</th><th>Paid at</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Booking</th>
+              <th>Amount</th>
+              <th>Payment method</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Submitted</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
           <tbody id="paymentsTable"></tbody>
         </table>
       </div>
@@ -256,13 +282,25 @@ function escapeHTML(value) {
 
 function money(value) {
   const amount = Number(value || 0);
-  return "$" + amount.toLocaleString("en-US", {minimumFractionDigits:2,maximumFractionDigits:2});
+  return "$" + amount.toLocaleString("en-US", {
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
+  });
+}
+
+function formatDate(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString();
 }
 
 function notify(message) {
   $("message").textContent = message;
   $("message").style.display = "block";
-  setTimeout(() => $("message").style.display = "none", 4000);
+  clearTimeout(window.starluxeMessageTimer);
+  window.starluxeMessageTimer = setTimeout(() => {
+    $("message").style.display = "none";
+  }, 4500);
 }
 
 function showModal(title, html) {
@@ -300,7 +338,8 @@ async function init() {
     return;
   }
 
-  const {data, error} = await db.auth.getSession();
+  const {data,error} = await db.auth.getSession();
+
   if (error || !data.session) {
     $("loginRequired").classList.remove("hidden");
     return;
@@ -334,12 +373,10 @@ document.querySelectorAll(".nav-btn").forEach(button => {
 });
 
 async function loadAll() {
-  await Promise.all([
-    loadCelebrities(),
-    loadPackages(),
-    loadBookings(),
-    loadPayments()
-  ]);
+  await loadCelebrities();
+  await loadPackages();
+  await loadBookings();
+  await loadPayments();
   renderOverview();
   renderCustomers();
 }
@@ -347,7 +384,12 @@ async function loadAll() {
 async function loadCelebrities() {
   const {data,error} = await db.from("celebrities")
     .select("*").order("created_at",{ascending:false});
-  if(error) { notify("Could not load celebrities: " + error.message); return; }
+
+  if(error) {
+    notify("Could not load celebrities: " + error.message);
+    return;
+  }
+
   celebrities = data || [];
   renderCelebrities();
   updateCelebritySelects();
@@ -355,10 +397,12 @@ async function loadCelebrities() {
 
 function renderCelebrities() {
   const search = ($("celebritySearch").value || "").toLowerCase();
+
   const rows = celebrities.filter(c =>
     (c.name || "").toLowerCase().includes(search) ||
     (c.country || "").toLowerCase().includes(search)
   );
+
   $("celebritiesTable").innerHTML = rows.length ? rows.map(c => `
     <tr>
       <td><strong>${escapeHTML(c.name)}</strong><br><small class="muted">${escapeHTML(c.slug)}</small></td>
@@ -376,8 +420,12 @@ function renderCelebrities() {
 $("celebritySearch").addEventListener("input", renderCelebrities);
 
 function updateCelebritySelects() {
-  const options = celebrities.map(c => `<option value="${escapeHTML(c.id)}">${escapeHTML(c.name)}</option>`).join("");
-  $("packageCelebrityFilter").innerHTML = `<option value="">All celebrities</option>${options}`;
+  const options = celebrities.map(c =>
+    `<option value="${escapeHTML(c.id)}">${escapeHTML(c.name)}</option>`
+  ).join("");
+
+  $("packageCelebrityFilter").innerHTML =
+    `<option value="">All celebrities</option>${options}`;
 }
 
 window.openCelebrity = function(c={}) {
@@ -431,32 +479,39 @@ window.openCelebrity = function(c={}) {
 
   form.addEventListener("submit", async e => {
     e.preventDefault();
+
     const fd = new FormData(form);
     const name = String(fd.get("name")||"").trim();
     const slug = String(fd.get("slug")||"").trim().toLowerCase()
-      .replace(/[^a-z0-9-]/g,"-").replace(/-+/g,"-").replace(/^-|-$/g,"");
+      .replace(/[^a-z0-9-]/g,"-").replace(/-+/g,"-")
+      .replace(/^-|-$/g,"");
+
     if (!name || !slug) return notify("Name and slug are required.");
 
     const country = String(fd.get("country")||"").trim();
     let language = String(fd.get("primary_language")||"en");
-    if (["germany","deutschland"].includes(country.toLowerCase())) language = "de-DE";
+
+    if (["germany","deutschland"].includes(country.toLowerCase())) {
+      language = "de-DE";
+    }
 
     let supported = String(fd.get("supported_languages")||"en")
       .split(",").map(x=>x.trim()).filter(Boolean);
+
     if (!supported.includes(language)) supported.unshift(language);
     if (!supported.includes("en")) supported.push("en");
 
     const record = {
-      name, slug,
-      profession: String(fd.get("profession")||"").trim() || null,
-      country: country || null,
-      biography: String(fd.get("biography")||"").trim() || null,
-      primary_language: language,
-      supported_languages: [...new Set(supported)],
-      verification_status: fd.get("verification_status"),
-      status: fd.get("status"),
-      featured: fd.get("featured")==="on",
-      updated_at: new Date().toISOString()
+      name,slug,
+      profession:String(fd.get("profession")||"").trim()||null,
+      country:country||null,
+      biography:String(fd.get("biography")||"").trim()||null,
+      primary_language:language,
+      supported_languages:[...new Set(supported)],
+      verification_status:fd.get("verification_status"),
+      status:fd.get("status"),
+      featured:fd.get("featured")==="on",
+      updated_at:new Date().toISOString()
     };
 
     try {
@@ -465,12 +520,15 @@ window.openCelebrity = function(c={}) {
       } else if (fd.get("profile_image")) {
         record.profile_image = String(fd.get("profile_image")).trim();
       }
+
       if (fd.get("cover_file")?.size) {
         record.cover_image = await uploadImage(fd.get("cover_file"),"celebrity-covers");
       } else if (fd.get("cover_image")) {
         record.cover_image = String(fd.get("cover_image")).trim();
       }
-    } catch(err) { return notify(err.message); }
+    } catch(err) {
+      return notify(err.message);
+    }
 
     const editingId = form.dataset.id || null;
     const result = editingId
@@ -478,9 +536,11 @@ window.openCelebrity = function(c={}) {
       : await db.from("celebrities").insert(record);
 
     if(result.error) return notify("Save failed: "+result.error.message);
+
     notify("Celebrity saved successfully.");
     closeModal();
     await loadCelebrities();
+    await loadPackages();
   });
 };
 
@@ -490,13 +550,22 @@ window.editCelebrity = function(id) {
 };
 
 async function uploadImage(file,folder) {
-  if(!file || !file.type.startsWith("image/")) throw new Error("Please select a valid image.");
-  if(file.size > 8*1024*1024) throw new Error("Image must be smaller than 8 MB.");
+  if(!file || !file.type.startsWith("image/")) {
+    throw new Error("Please select a valid image.");
+  }
+
+  if(file.size > 8*1024*1024) {
+    throw new Error("Image must be smaller than 8 MB.");
+  }
+
   const safeName = file.name.toLowerCase().replace(/[^a-z0-9.-]/g,"-");
   const path = folder + "/" + crypto.randomUUID() + "-" + safeName;
+
   const {error} = await db.storage.from("starluxe-media")
     .upload(path,file,{cacheControl:"3600",upsert:false});
+
   if(error) throw error;
+
   const {data} = db.storage.from("starluxe-media").getPublicUrl(path);
   return data.publicUrl;
 }
@@ -504,9 +573,12 @@ async function uploadImage(file,folder) {
 window.editCelebrityTranslations = async function(id) {
   const c = celebrities.find(x=>x.id===id);
   if(!c) return;
+
   const {data,error} = await db.from("celebrity_translations")
     .select("*").eq("celebrity_id",id);
+
   if(error) return notify(error.message);
+
   const translations = data || [];
   const german = translations.find(t=>t.language_code==="de-DE") || {};
   const english = translations.find(t=>t.language_code==="en") || {};
@@ -533,13 +605,17 @@ window.editCelebrityTranslations = async function(id) {
 
   $("translationForm").addEventListener("submit",async e=>{
     e.preventDefault();
+
     const fd=new FormData(e.currentTarget);
     const records=[];
+
     for(const lang of ["de","en"]){
       const code=lang==="de"?"de-DE":"en";
       const prefix=lang+"_";
+
       const row={
-        celebrity_id:id,language_code:code,
+        celebrity_id:id,
+        language_code:code,
         name:String(fd.get(prefix+"name")||"").trim()||c.name,
         profession:String(fd.get(prefix+"profession")||"").trim()||null,
         biography:String(fd.get(prefix+"biography")||"").trim()||null,
@@ -547,12 +623,18 @@ window.editCelebrityTranslations = async function(id) {
         seo_description:String(fd.get(prefix+"seo_description")||"").trim()||null,
         updated_at:new Date().toISOString()
       };
-      if(row.name!==c.name || row.profession || row.biography || row.seo_title || row.seo_description) records.push(row);
+
+      if(row.name!==c.name || row.profession || row.biography ||
+         row.seo_title || row.seo_description) records.push(row);
     }
+
     if(!records.length) return notify("Enter at least one translation first.");
+
     const {error}=await db.from("celebrity_translations")
       .upsert(records,{onConflict:"celebrity_id,language_code"});
+
     if(error) return notify("Translation save failed: "+error.message);
+
     notify("Translations saved.");
     closeModal();
   });
@@ -561,7 +643,12 @@ window.editCelebrityTranslations = async function(id) {
 async function loadPackages() {
   const {data,error}=await db.from("booking_packages")
     .select("*").order("created_at",{ascending:false});
-  if(error){notify("Packages: "+error.message);return;}
+
+  if(error) {
+    notify("Packages: "+error.message);
+    return;
+  }
+
   packages=data||[];
   renderPackages();
 }
@@ -569,8 +656,10 @@ async function loadPackages() {
 function renderPackages() {
   const filter=$("packageCelebrityFilter").value;
   const rows=packages.filter(p=>!filter||p.celebrity_id===filter);
+
   $("packagesTable").innerHTML=rows.length?rows.map(p=>{
     const c=celebrities.find(x=>x.id===p.celebrity_id);
+
     return `<tr>
       <td><strong>${escapeHTML(p.name)}</strong><br><small class="muted">${escapeHTML(p.description||"")}</small></td>
       <td>${escapeHTML(c?.name||"Unknown")}</td>
@@ -590,7 +679,9 @@ $("packageCelebrityFilter").addEventListener("change",renderPackages);
 
 window.openPackage=function(p={}) {
   if(!celebrities.length) return notify("Add a celebrity profile first.");
+
   const opts=celebrities.map(c=>({value:c.id,label:c.name}));
+
   showModal(p.id?"Edit booking package":"Create booking package",`
     <form id="packageForm">
       ${selectField("Celebrity","celebrity_id",opts,p.celebrity_id||celebrities[0].id)}
@@ -616,9 +707,12 @@ window.openPackage=function(p={}) {
       <div class="form-actions"><button class="btn" type="submit">Save package</button></div>
     </form>
   `);
+
   $("packageForm").addEventListener("submit",async e=>{
     e.preventDefault();
+
     const fd=new FormData(e.currentTarget);
+
     const record={
       celebrity_id:fd.get("celebrity_id"),
       name:String(fd.get("name")||"").trim(),
@@ -630,15 +724,22 @@ window.openPackage=function(p={}) {
       is_active:fd.get("is_active")==="on",
       updated_at:new Date().toISOString()
     };
-    if(!record.name||!Number.isFinite(record.price_usd)||record.price_usd<0||
-      !Number.isFinite(record.deposit_percentage)||record.deposit_percentage<0||
-      record.deposit_percentage>100) return notify("Check the package name, price and deposit percentage.");
+
+    if(!record.name || !Number.isFinite(record.price_usd) ||
+       record.price_usd<0 || !Number.isFinite(record.deposit_percentage) ||
+       record.deposit_percentage<0 || record.deposit_percentage>100) {
+      return notify("Check the package name, price and deposit percentage.");
+    }
+
     const result=p.id
       ? await db.from("booking_packages").update(record).eq("id",p.id)
       : await db.from("booking_packages").insert(record);
+
     if(result.error) return notify("Package save failed: "+result.error.message);
+
     notify("Package saved.");
-    closeModal(); await loadPackages();
+    closeModal();
+    await loadPackages();
   });
 };
 
@@ -650,12 +751,16 @@ window.editPackage=id=>{
 window.editPackageTranslations=async id=>{
   const p=packages.find(x=>x.id===id);
   if(!p) return;
+
   const {data,error}=await db.from("booking_package_translations")
     .select("*").eq("package_id",id);
+
   if(error) return notify(error.message);
+
   const rows=data||[];
   const de=rows.find(x=>x.language_code==="de-DE")||{};
   const en=rows.find(x=>x.language_code==="en")||{};
+
   showModal("Package translations",`
     <form id="packageTranslationForm">
       <h3>German (de-DE)</h3>
@@ -667,32 +772,48 @@ window.editPackageTranslations=async id=>{
       <div class="form-actions"><button class="btn">Save translations</button></div>
     </form>
   `);
+
   $("packageTranslationForm").addEventListener("submit",async e=>{
     e.preventDefault();
+
     const fd=new FormData(e.currentTarget);
     const records=[];
+
     for(const lang of ["de","en"]){
       const prefix=lang+"_";
       const name=String(fd.get(prefix+"name")||"").trim();
       const description=String(fd.get(prefix+"description")||"").trim();
+
       if(name||description) records.push({
-        package_id:id,language_code:lang==="de"?"de-DE":"en",
-        name:name||p.name,description:description||null,
+        package_id:id,
+        language_code:lang==="de"?"de-DE":"en",
+        name:name||p.name,
+        description:description||null,
         updated_at:new Date().toISOString()
       });
     }
+
     if(!records.length) return notify("Enter at least one translation.");
+
     const {error}=await db.from("booking_package_translations")
       .upsert(records,{onConflict:"package_id,language_code"});
+
     if(error) return notify(error.message);
-    notify("Package translations saved.");closeModal();
+
+    notify("Package translations saved.");
+    closeModal();
   });
 };
 
 async function loadBookings() {
   const {data,error}=await db.from("celebrity_bookings")
     .select("*").order("created_at",{ascending:false});
-  if(error){notify("Bookings: "+error.message);return;}
+
+  if(error) {
+    notify("Bookings: "+error.message);
+    return;
+  }
+
   bookings=data||[];
   renderBookings();
 }
@@ -700,8 +821,10 @@ async function loadBookings() {
 function renderBookings() {
   const filter=$("bookingFilter").value;
   const rows=bookings.filter(b=>!filter||b.status===filter);
+
   $("bookingsTable").innerHTML=rows.length?rows.map(b=>{
     const c=celebrities.find(x=>x.id===b.celebrity_id);
+
     return `<tr>
       <td><strong>${escapeHTML(b.booking_reference)}</strong></td>
       <td>${escapeHTML(b.customer_name)}<br><small class="muted">${escapeHTML(b.customer_email)}</small></td>
@@ -719,7 +842,9 @@ $("bookingFilter").addEventListener("change",renderBookings);
 window.viewBooking=function(id) {
   const b=bookings.find(x=>x.id===id);
   if(!b) return;
+
   const c=celebrities.find(x=>x.id===b.celebrity_id);
+
   showModal("Review booking "+b.booking_reference,`
     <div class="panel">
       <p><strong>Customer:</strong> ${escapeHTML(b.customer_name)}</p>
@@ -748,77 +873,280 @@ window.viewBooking=function(id) {
       <div class="form-actions"><button class="btn">Save booking decision</button></div>
     </form>
   `);
+
   $("bookingReviewForm").addEventListener("submit",async e=>{
     e.preventDefault();
+
     const fd=new FormData(e.currentTarget);
+
     const {error}=await db.from("celebrity_bookings")
-      .update({status:fd.get("status"),admin_response:String(fd.get("admin_response")||"").trim()||null,updated_at:new Date().toISOString()})
+      .update({
+        status:fd.get("status"),
+        admin_response:String(fd.get("admin_response")||"").trim()||null,
+        updated_at:new Date().toISOString()
+      })
       .eq("id",id);
+
     if(error) return notify("Booking update failed: "+error.message);
+
     notify("Booking updated.");
-    closeModal();await loadBookings();
+    closeModal();
+    await loadBookings();
+    renderOverview();
+    renderCustomers();
   });
 };
+
+/* PAYMENT MANAGEMENT */
+
+function paymentMethodLabel(payment) {
+  const labels = {
+    grey_transfer:"Grey bank transfer",
+    usdt:"USDT",
+    usdc:"USDC",
+    btc:"Bitcoin (BTC)"
+  };
+
+  let label = labels[payment.payment_method] || payment.payment_method || "Not specified";
+
+  if(payment.payment_network) {
+    label += " — " + payment.payment_network;
+  }
+
+  return label;
+}
+
+function paymentStatusClass(status) {
+  if(status==="paid") return "green";
+  if(status==="failed" || status==="refunded") return "red";
+  return "";
+}
 
 async function loadPayments() {
   const {data,error}=await db.from("booking_payments")
     .select("*").order("created_at",{ascending:false});
-  if(error){notify("Payments: "+error.message);return;}
+
+  if(error) {
+    notify("Payments: "+error.message);
+    return;
+  }
+
   payments=data||[];
-  $("paymentsTable").innerHTML=payments.length?payments.map(p=>`
-    <tr>
-      <td>${escapeHTML(bookings.find(b=>b.id===p.booking_id)?.booking_reference||p.booking_id)}</td>
-      <td>${money(p.amount_usd)}</td>
-      <td>${escapeHTML(p.currency||"USD")}</td>
-      <td>${escapeHTML(p.payment_type)}</td>
-      <td><span class="status">${escapeHTML(p.payment_status)}</span></td>
-      <td>${escapeHTML(p.paid_at||"—")}</td>
-    </tr>`).join(""):`<tr><td colspan="6" class="empty">No payment records found.</td></tr>`;
+  renderPayments();
+  renderOverview();
 }
+
+function renderPayments() {
+  const filter=$("paymentFilter").value;
+  const rows=payments.filter(p=>!filter||p.payment_status===filter);
+
+  $("paymentsTable").innerHTML=rows.length?rows.map(p=>{
+    const booking=bookings.find(b=>b.id===p.booking_id);
+    const status=p.payment_status||"pending";
+
+    return `<tr>
+      <td>
+        <strong>${escapeHTML(booking?.booking_reference||"Booking")}</strong>
+        <br><small class="muted">${escapeHTML(p.booking_id)}</small>
+      </td>
+      <td>${money(p.amount_usd)}</td>
+      <td>${escapeHTML(paymentMethodLabel(p))}</td>
+      <td>${escapeHTML(p.payment_type||"—")}</td>
+      <td><span class="status ${paymentStatusClass(status)}">${escapeHTML(status)}</span></td>
+      <td>${escapeHTML(formatDate(p.submitted_at||p.created_at))}</td>
+      <td>
+        <button class="btn secondary small" onclick="reviewPayment('${p.id}')">Review</button>
+      </td>
+    </tr>`;
+  }).join(""):`<tr><td colspan="7" class="empty">No payment records found.</td></tr>`;
+}
+
+$("paymentFilter").addEventListener("change",renderPayments);
+
+window.reviewPayment=async function(id) {
+  const p=payments.find(x=>x.id===id);
+  if(!p) return notify("Payment record not found.");
+
+  const booking=bookings.find(b=>b.id===p.booking_id);
+  let proofHTML='<span class="muted">No payment evidence uploaded.</span>';
+
+  if(p.proof_storage_path) {
+    const {data,error}=await db.storage
+      .from("starluxe-payment-proofs")
+      .createSignedUrl(p.proof_storage_path,300);
+
+    if(error) {
+      proofHTML='<span class="muted">Could not open payment evidence: '+escapeHTML(error.message)+'</span>';
+    } else if(data?.signedUrl) {
+      proofHTML=`<a class="proof-link" href="${escapeHTML(data.signedUrl)}" target="_blank" rel="noopener noreferrer">Open private payment evidence</a><br><small class="muted">This secure link expires in 5 minutes.</small>`;
+    }
+  }
+
+  const canReview=p.payment_status==="pending";
+
+  showModal("Payment review",`
+    <div class="panel">
+      <div class="detail-line"><strong>Booking reference:</strong> ${escapeHTML(booking?.booking_reference||p.booking_id)}</div>
+      <div class="detail-line"><strong>Customer:</strong> ${escapeHTML(booking?.customer_name||"—")}</div>
+      <div class="detail-line"><strong>Email:</strong> ${escapeHTML(booking?.customer_email||"—")}</div>
+      <div class="detail-line"><strong>Payment amount:</strong> ${money(p.amount_usd)} ${escapeHTML(p.currency||"USD")}</div>
+      <div class="detail-line"><strong>Payment type:</strong> ${escapeHTML(p.payment_type||"—")}</div>
+      <div class="detail-line"><strong>Payment method:</strong> ${escapeHTML(paymentMethodLabel(p))}</div>
+      <div class="detail-line"><strong>Amount received:</strong> ${escapeHTML(p.amount_received??"Not provided")} ${escapeHTML(p.received_currency||"")}</div>
+      <div class="detail-line"><strong>Transaction reference:</strong> ${escapeHTML(p.transaction_reference||"Not provided")}</div>
+      <div class="detail-line"><strong>Transaction hash:</strong> ${escapeHTML(p.transaction_hash||"Not provided")}</div>
+      <div class="detail-line"><strong>Submitted:</strong> ${escapeHTML(formatDate(p.submitted_at||p.created_at))}</div>
+      <div class="detail-line"><strong>Current payment status:</strong> ${escapeHTML(p.payment_status)}</div>
+      <div class="detail-line"><strong>Payment evidence:</strong><br>${proofHTML}</div>
+      <div class="detail-line"><strong>Previously verified:</strong> ${escapeHTML(formatDate(p.verified_at))}</div>
+      <div class="detail-line"><strong>Previous admin notes:</strong><br>${escapeHTML(p.admin_notes||"None")}</div>
+    </div>
+
+    ${canReview?`
+      <form id="paymentReviewForm">
+        ${area("Private admin notes","admin_notes",p.admin_notes||"")}
+        <p class="muted">Approving marks this payment as paid. Rejecting marks it failed. The booking itself will not be confirmed automatically.</p>
+        <div class="form-actions">
+          <button class="btn" type="button" id="approvePaymentBtn">Approve payment</button>
+          <button class="btn danger" type="button" id="rejectPaymentBtn">Reject payment</button>
+          <button class="btn secondary" type="button" onclick="closeModal()">Close</button>
+        </div>
+      </form>
+    `:`
+      <div class="notice">This payment has already been reviewed. Its status cannot be changed from this screen.</div>
+      <button class="btn secondary" onclick="closeModal()">Close</button>
+    `}
+  `);
+
+  if(canReview) {
+    $("approvePaymentBtn").addEventListener("click",()=>decidePayment(id,"approve"));
+    $("rejectPaymentBtn").addEventListener("click",()=>decidePayment(id,"reject"));
+  }
+};
+
+async function decidePayment(paymentId,action) {
+  const notes=String($("paymentReviewForm")?.elements.namedItem("admin_notes")?.value||"").trim();
+
+  const buttonId=action==="approve"?"approvePaymentBtn":"rejectPaymentBtn";
+  const button=$(buttonId);
+
+  if(button) {
+    button.disabled=true;
+    button.textContent="Processing...";
+  }
+
+  const {data,error}=await db.functions.invoke("verify-booking-payment",{
+    body:{
+      payment_id:paymentId,
+      action,
+      admin_notes:notes
+    }
+  });
+
+  if(error) {
+    if(button) {
+      button.disabled=false;
+      button.textContent=action==="approve"?"Approve payment":"Reject payment";
+    }
+    return notify("Verification failed: "+error.message);
+  }
+
+  if(!data?.success) {
+    if(button) {
+      button.disabled=false;
+      button.textContent=action==="approve"?"Approve payment":"Reject payment";
+    }
+    return notify(data?.error||"The payment could not be updated.");
+  }
+
+  closeModal();
+
+  if(data.warning) notify(data.warning);
+  else notify(data.message||"Payment updated successfully.");
+
+  await loadBookings();
+  await loadPayments();
+  renderOverview();
+  renderCustomers();
+}
+
+/* CUSTOMERS */
 
 function renderCustomers() {
   const customers=new Map();
+
   bookings.forEach(b=>{
     const key=(b.customer_email||"").toLowerCase();
-    if(!key)return;
-    if(!customers.has(key)) customers.set(key,{
-      name:b.customer_name,email:b.customer_email,phone:b.customer_phone,
-      count:0,last:b.created_at
-    });
+    if(!key) return;
+
+    if(!customers.has(key)) {
+      customers.set(key,{
+        name:b.customer_name,
+        email:b.customer_email,
+        phone:b.customer_phone,
+        count:0,
+        last:b.created_at
+      });
+    }
+
     const customer=customers.get(key);
     customer.count++;
+
     if(b.created_at>customer.last) customer.last=b.created_at;
     if(!customer.phone&&b.customer_phone) customer.phone=b.customer_phone;
   });
+
   const rows=[...customers.values()];
+
   $("customersTable").innerHTML=rows.length?rows.map(c=>`
-    <tr><td>${escapeHTML(c.name)}</td><td>${escapeHTML(c.email)}</td>
-    <td>${escapeHTML(c.phone||"—")}</td><td>${c.count}</td>
-    <td>${escapeHTML(c.last||"—")}</td></tr>`).join("")
+    <tr>
+      <td>${escapeHTML(c.name)}</td>
+      <td>${escapeHTML(c.email)}</td>
+      <td>${escapeHTML(c.phone||"—")}</td>
+      <td>${c.count}</td>
+      <td>${escapeHTML(formatDate(c.last))}</td>
+    </tr>`).join("")
     :`<tr><td colspan="5" class="empty">No customer booking records yet.</td></tr>`;
 }
+
+/* OVERVIEW */
 
 function renderOverview() {
   $("statCelebrities").textContent=celebrities.length;
   $("statPackages").textContent=packages.length;
   $("statBookings").textContent=bookings.length;
-  $("statPending").textContent=bookings.filter(b=>["pending","under_review"].includes(b.status)).length;
+
+  $("statPending").textContent=bookings.filter(b=>
+    ["pending","under_review"].includes(b.status)
+  ).length;
+
   $("statPayments").textContent=payments.length;
+
+  $("statPendingPayments").textContent=payments.filter(p=>
+    p.payment_status==="pending"
+  ).length;
+
   $("recentBookings").innerHTML=bookings.slice(0,8).map(b=>{
     const c=celebrities.find(x=>x.id===b.celebrity_id);
+
     return `<tr>
       <td>${escapeHTML(b.booking_reference)}</td>
       <td>${escapeHTML(b.customer_name)}</td>
       <td>${escapeHTML(c?.name||"—")}</td>
       <td>${escapeHTML(b.status)}</td>
-      <td>${escapeHTML(b.created_at||"")}</td>
+      <td>${escapeHTML(formatDate(b.created_at))}</td>
     </tr>`;
   }).join("")||`<tr><td colspan="5" class="empty">No bookings yet.</td></tr>`;
 }
 
 window.closeModal=closeModal;
 window.loadAll=loadAll;
-window.loadBookings=loadBookings;
+window.loadBookings=async()=>{
+  await loadBookings();
+  renderOverview();
+  renderCustomers();
+};
+window.loadPayments=loadPayments;
 
 init();
 })();
